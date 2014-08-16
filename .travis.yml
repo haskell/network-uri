@@ -7,7 +7,7 @@ env:
  # no package for earlier cabal versions in the PPA
  - GHCVER=7.4.2 CABALVER=1.16
  - GHCVER=7.6.3 CABALVER=1.16
- - GHCVER=7.8.2 CABALVER=1.20
+ - GHCVER=7.8.2 CABALVER=1.18
  - GHCVER=head  CABALVER=1.20
 
 matrix:
