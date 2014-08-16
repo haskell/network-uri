@@ -1,0 +1,42 @@
+name:                network-uri
+version:             2.6.0.0
+synopsis:            URI manipulation
+description:         This package provides an URI manipulation inteface.
+homepage:            https://github.com/haskell/network-uri
+bug-reports:         https://github.com/haskell/network-uri/issues
+license:             BSD3
+license-file:        LICENSE
+maintainer:          johan.tibell@gmail.com
+category:            Network
+build-type:          Simple
+cabal-version:       >=1.10
+
+library
+  exposed-modules:
+    Network.URI
+  build-depends:
+    base >= 3 && < 5,
+    parsec >= 3.0
+  default-extensions: CPP, DeriveDataTypeable
+  ghc-options: -Wall -fwarn-tabs
+  default-language: Haskell98
+
+test-suite uri
+  hs-source-dirs: tests
+  main-is: uri001.hs
+  type: exitcode-stdio-1.0
+
+  build-depends:
+    base < 5,
+    HUnit,
+    network,
+    test-framework,
+    test-framework-hunit,
+    test-framework-quickcheck2
+
+  ghc-options: -Wall -fwarn-tabs
+  default-language: Haskell98
+
+source-repository head
+  type:     git
+  location: git://github.com/haskell/network-uri.git
