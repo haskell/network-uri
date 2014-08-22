@@ -125,6 +125,7 @@ import Text.ParserCombinators.Parsec
     )
 
 import Control.Monad (MonadPlus(..))
+import Control.DeepSeq (NFData(rnf), deepseq)
 import Data.Char (ord, chr, isHexDigit, toLower, toUpper, digitToInt)
 import Data.Bits ((.|.),(.&.),shiftL,shiftR)
 import Debug.Trace (trace)
@@ -158,12 +159,19 @@ data URI = URI
     , uriFragment   :: String           -- ^ @#frag@
     } deriving (Eq, Ord, Typeable, Data)
 
+instance NFData URI where
+    rnf (URI s a p q f)
+        = s `deepseq` a `deepseq` p `deepseq` q `deepseq` f `deepseq` ()
+
 -- |Type for authority value within a URI
 data URIAuth = URIAuth
     { uriUserInfo   :: String           -- ^ @anonymous\@@
     , uriRegName    :: String           -- ^ @www.haskell.org@
     , uriPort       :: String           -- ^ @:42@
     } deriving (Eq, Ord, Show, Typeable, Data)
+
+instance NFData URIAuth where
+    rnf (URIAuth ui rn p) = ui `deepseq` rn `deepseq` p `deepseq` ()
 
 -- |Blank URI
 nullURI :: URI

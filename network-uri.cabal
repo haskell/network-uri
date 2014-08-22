@@ -37,6 +37,7 @@ library
     Network.URI
   build-depends:
     base >= 3 && < 5,
+    deepseq >= 1.1 && < 1.4,
     parsec >= 3.0 && < 3.2
   default-extensions: CPP, DeriveDataTypeable
   ghc-options: -Wall -fwarn-tabs
