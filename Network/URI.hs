@@ -118,17 +118,18 @@ module Network.URI
 
 import Text.ParserCombinators.Parsec
     ( GenParser, ParseError
-    , parse, (<|>), (<?>), try
-    , option, many, many1, count, notFollowedBy
+    , parse, (<?>), try
+    , option, many1, count, notFollowedBy
     , char, satisfy, oneOf, string, eof
     , unexpected
     )
 
-import Control.Monad (MonadPlus(..))
+import Control.Applicative
+import Control.Monad (MonadPlus(..), void)
+import Data.Traversable (sequenceA)
 import Control.DeepSeq (NFData(rnf), deepseq)
 import Data.Char (ord, chr, isHexDigit, toLower, toUpper, digitToInt)
 import Data.Bits ((.|.),(.&.),shiftL,shiftR)
-import Debug.Trace (trace)
 import Numeric (showIntAtBase)
 
 import Data.Typeable (Typeable)
@@ -205,18 +206,6 @@ defaultUserInfoMap uinf = user++newpass
                         then pass
                         else ":...@"
 
-testDefaultUserInfoMap :: [Bool]
-testDefaultUserInfoMap =
-     [ defaultUserInfoMap ""                == ""
-     , defaultUserInfoMap "@"               == "@"
-     , defaultUserInfoMap "user@"           == "user@"
-     , defaultUserInfoMap "user:@"          == "user:@"
-     , defaultUserInfoMap "user:anonymous@" == "user:...@"
-     , defaultUserInfoMap "user:pass@"      == "user:...@"
-     , defaultUserInfoMap "user:pass"       == "user:...@"
-     , defaultUserInfoMap "user:anonymous"  == "user:...@"
-     ]
-
 ------------------------------------------------------------
 --  Parse a URI
 ------------------------------------------------------------
@@ -287,11 +276,6 @@ isIPv6address = isValidParse ipv6address
 isIPv4address :: String -> Bool
 isIPv4address = isValidParse ipv4address
 
--- |Test function: parse and reconstruct a URI reference
---
-testURIReference :: String -> String
-testURIReference uristr = show (parseAll uriReference "" uristr)
-
 --  Helper function for turning a string into a URI
 --
 parseURIAny :: URIParser URI -> String -> Maybe URI
@@ -321,7 +305,7 @@ parseAll parser filename uristr = parse newparser filename uristr
 ------------------------------------------------------------
 
 uriIsAbsolute :: URI -> Bool
-uriIsAbsolute (URI {uriScheme = scheme}) = scheme /= ""
+uriIsAbsolute (URI {uriScheme = scheme'}) = scheme' /= ""
 
 uriIsRelative :: URI -> Bool
 uriIsRelative = not . uriIsAbsolute
@@ -339,12 +323,7 @@ type URIParser a = GenParser Char () a
 --  Parse and return a 'pct-encoded' sequence
 --
 escaped :: URIParser String
-escaped =
-    do  { char '%'
-        ; h1 <- hexDigitChar
-        ; h2 <- hexDigitChar
-        ; return $ ['%',h1,h2]
-        }
+escaped = sequenceA [char '%', hexDigitChar, hexDigitChar]
 
 --  RFC3986, section 2.2
 --
@@ -361,11 +340,8 @@ isGenDelims c = c `elem` ":/?#[]@"
 isSubDelims :: Char -> Bool
 isSubDelims c = c `elem` "!$&'()*+,;="
 
-genDelims :: URIParser String
-genDelims = do { c <- satisfy isGenDelims ; return [c] }
-
 subDelims :: URIParser String
-subDelims = do { c <- satisfy isSubDelims ; return [c] }
+subDelims = (:[]) <$> oneOf "!$&'()*+,;="
 
 --  RFC3986, section 2.3
 --
@@ -378,7 +354,7 @@ isUnreserved :: Char -> Bool
 isUnreserved c = isAlphaNumChar c || (c `elem` "-_.~")
 
 unreservedChar :: URIParser String
-unreservedChar = do { c <- satisfy isUnreserved ; return [c] }
+unreservedChar = (:[]) <$> satisfy isUnreserved
 
 --  RFC3986, section 3
 --
@@ -395,8 +371,8 @@ uri =
         -- ; ua <- option Nothing ( do { try (string "//") ; uauthority } )
         -- ; up <- upath
         ; (ua,up) <- hierPart
-        ; uq <- option "" ( do { char '?' ; uquery    } )
-        ; uf <- option "" ( do { char '#' ; ufragment } )
+        ; uq <- option "" ( do { void $ char '?' ; uquery    } )
+        ; uf <- option "" ( do { void $ char '#' ; ufragment } )
         ; return $ URI
             { uriScheme    = us
             , uriAuthority = ua
@@ -408,7 +384,7 @@ uri =
 
 hierPart :: URIParser ((Maybe URIAuth),String)
 hierPart =
-        do  { try (string "//")
+        do  { void $ try (string "//")
             ; ua <- uauthority
             ; up <- pathAbEmpty
             ; return (ua,up)
@@ -427,7 +403,7 @@ hierPart =
 uscheme :: URIParser String
 uscheme =
     do  { s <- oneThenMany alphaChar (satisfy isSchemeChar)
-        ; char ':'
+        ; void $ char ':'
         ; return $ s++":"
         }
 
@@ -450,7 +426,7 @@ uauthority =
 userinfo :: URIParser String
 userinfo =
     do  { uu <- many (uchar ";:&=+$,")
-        ; char '@'
+        ; void $ char '@'
         ; return (concat uu ++"@")
         }
 
@@ -461,18 +437,18 @@ host = ipLiteral <|> try ipv4address <|> regName
 
 ipLiteral :: URIParser String
 ipLiteral =
-    do  { char '['
+    do  { void $ char '['
         ; ua <- ( ipv6address <|> ipvFuture )
-        ; char ']'
+        ; void $ char ']'
         ; return $ "[" ++ ua ++ "]"
         }
     <?> "IP address literal"
 
 ipvFuture :: URIParser String
 ipvFuture =
-    do  { char 'v'
+    do  { void $ char 'v'
         ; h <- hexDigitChar
-        ; char '.'
+        ; void $ char '.'
         ; a <- many1 (satisfy isIpvFutureChar)
         ; return $ 'v':h:'.':a
         }
@@ -488,54 +464,54 @@ ipv6address =
                 ; return $ concat a2 ++ a3
                 } )
     <|> try ( do
-                { string "::"
+                { void $ string "::"
                 ; a2 <- count 5 h4c
                 ; a3 <- ls32
                 ; return $ "::" ++ concat a2 ++ a3
                 } )
     <|> try ( do
                 { a1 <- opt_n_h4c_h4 0
-                ; string "::"
+                ; void $ string "::"
                 ; a2 <- count 4 h4c
                 ; a3 <- ls32
                 ; return $ a1 ++ "::" ++ concat a2 ++ a3
                 } )
     <|> try ( do
                 { a1 <- opt_n_h4c_h4 1
-                ; string "::"
+                ; void $ string "::"
                 ; a2 <- count 3 h4c
                 ; a3 <- ls32
                 ; return $ a1 ++ "::" ++ concat a2 ++ a3
                 } )
     <|> try ( do
                 { a1 <- opt_n_h4c_h4 2
-                ; string "::"
+                ; void $ string "::"
                 ; a2 <- count 2 h4c
                 ; a3 <- ls32
                 ; return $ a1 ++ "::" ++ concat a2 ++ a3
                 } )
     <|> try ( do
                 { a1 <- opt_n_h4c_h4 3
-                ; string "::"
+                ; void $ string "::"
                 ; a2 <- h4c
                 ; a3 <- ls32
                 ; return $ a1 ++ "::" ++ a2 ++ a3
                 } )
     <|> try ( do
                 { a1 <- opt_n_h4c_h4 4
-                ; string "::"
+                ; void $ string "::"
                 ; a3 <- ls32
                 ; return $ a1 ++ "::" ++ a3
                 } )
     <|> try ( do
                 { a1 <- opt_n_h4c_h4 5
-                ; string "::"
+                ; void $ string "::"
                 ; a3 <- h4
                 ; return $ a1 ++ "::" ++ a3
                 } )
     <|> try ( do
                 { a1 <- opt_n_h4c_h4 6
-                ; string "::"
+                ; void $ string "::"
                 ; return $ a1 ++ "::"
                 } )
     <?> "IPv6 address"
@@ -558,8 +534,8 @@ ls32 =  try ( do
 h4c :: URIParser String
 h4c = try $
     do  { a1 <- h4
-        ; char ':'
-        ; notFollowedBy (char ':')
+        ; void $ char ':'
+        ; void $ notFollowedBy (char ':')
         ; return $ a1 ++ ":"
         }
 
@@ -568,11 +544,11 @@ h4 = countMinMax 1 4 hexDigitChar
 
 ipv4address :: URIParser String
 ipv4address =
-    do  { a1 <- decOctet ; char '.'
-        ; a2 <- decOctet ; char '.'
-        ; a3 <- decOctet ; char '.'
+    do  { a1 <- decOctet ; void $ char '.'
+        ; a2 <- decOctet ; void $ char '.'
+        ; a3 <- decOctet ; void $ char '.'
         ; a4 <- decOctet
-        ; notFollowedBy regName
+        ; void $ notFollowedBy regName
         ; return $ a1++"."++a2++"."++a3++"."++a4
         }
     <?> "IPv4 Address"
@@ -597,7 +573,7 @@ regName =
 
 port :: URIParser String
 port =
-    do  { char ':'
+    do  { void $ char ':'
         ; p <- many digitChar
         ; return (':':p)
         }
@@ -640,7 +616,7 @@ pathAbEmpty =
 
 pathAbs :: URIParser String
 pathAbs =
-    do  { char '/'
+    do  { void $ char '/'
         ; ss <- option "" pathRootLess
         ; return $ '/':ss
         }
@@ -661,7 +637,7 @@ pathRootLess =
 
 slashSegment :: URIParser String
 slashSegment =
-    do  { char '/'
+    do  { void $ char '/'
         ; s <- segment
         ; return ('/':s)
         }
@@ -733,8 +709,8 @@ relativeRef =
         -- ; ua <- option Nothing ( do { try (string "//") ; uauthority } )
         -- ; up <- upath
         ; (ua,up) <- relativePart
-        ; uq <- option "" ( do { char '?' ; uquery    } )
-        ; uf <- option "" ( do { char '#' ; ufragment } )
+        ; uq <- option "" ( do { void $ char '?' ; uquery    } )
+        ; uf <- option "" ( do { void $ char '#' ; ufragment } )
         ; return $ URI
             { uriScheme    = ""
             , uriAuthority = ua
@@ -746,7 +722,7 @@ relativeRef =
 
 relativePart :: URIParser ((Maybe URIAuth),String)
 relativePart =
-        do  { try (string "//")
+        do  { void $ try (string "//")
             ; ua <- uauthority
             ; up <- pathAbEmpty
             ; return (ua,up)
@@ -768,7 +744,7 @@ absoluteURI =
         -- ; ua <- option Nothing ( do { try (string "//") ; uauthority } )
         -- ; up <- upath
         ; (ua,up) <- hierPart
-        ; uq <- option "" ( do { char '?' ; uquery    } )
+        ; uq <- option "" ( do { void $ char '?' ; uquery    } )
         ; return $ URI
             { uriScheme    = us
             , uriAuthority = ua
@@ -808,9 +784,6 @@ alphaChar = satisfy isAlphaChar         -- or: Parsec.letter ?
 
 digitChar :: URIParser Char
 digitChar = satisfy isDigitChar         -- or: Parsec.digit ?
-
-alphaNumChar :: URIParser Char
-alphaNumChar = satisfy isAlphaNumChar
 
 hexDigitChar :: URIParser Char
 hexDigitChar = satisfy isHexDigitChar   -- or: Parsec.hexDigit ?
@@ -980,6 +953,7 @@ unEscapeUtf8 c rest
                             else replacement_character : unEscapeString ds
       _ -> replacement_character : unEscapeString rest
 
+    multi_byte :: Int -> Int -> Int -> String
     multi_byte i mask overlong =
       aux i rest (unEscapeByte rest) (c .&. mask)
       where
@@ -1261,16 +1235,6 @@ normalizePathSegments uristr = normstr juri
         normstr Nothing  = uristr
         normstr (Just u) = show (normuri u)
         normuri u = u { uriPath = removeDotSegments (uriPath u) }
-
-------------------------------------------------------------
---  Local trace helper functions
-------------------------------------------------------------
-
-traceShow :: Show a => String -> a -> a
-traceShow msg x = trace (msg ++ show x) x
-
-traceVal :: Show a => String -> a -> b -> b
-traceVal msg x y = trace (msg ++ show x) y
 
 ------------------------------------------------------------
 --  Deprecated functions

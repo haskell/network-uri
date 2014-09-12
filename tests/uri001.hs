@@ -232,9 +232,9 @@ testURIRef119 = testURIRef AbsId "http://192.168.0.1.example.com./"
 testURIRef120 = testURIRef AbsId "http://192.168.0.1test.example.com/"
 -- URI with IPv(future) address
 testURIRef121 = testURIRef AbsId "http://[v9.123.abc;456.def]/"
-testURIRef122 = testEq "v.future authority" 
+testURIRef122 = testEq "v.future authority"
                        (Just (URIAuth "" "[v9.123.abc;456.def]" ":42"))
-                       ((maybe Nothing uriAuthority) . parseURI $ "http://[v9.123.abc;456.def]:42/") 
+                       ((maybe Nothing uriAuthority) . parseURI $ "http://[v9.123.abc;456.def]:42/")
 -- URI with non-ASCII characters, fail with Network.HTTP escaping code (see below)
 -- Currently not supported by Network.URI, but captured here for possible future reference
 -- when IRI support may be added.
@@ -1106,9 +1106,9 @@ testEscapeURIString06 = testEq "testEscapeURIString06"
 
 propEscapeUnEscapeLoop :: String -> Bool
 propEscapeUnEscapeLoop s = s == (unEscapeString $! escaped)
-	where
-	escaped = escapeURIString (const False) s
-	{-# NOINLINE escaped #-}
+        where
+        escaped = escapeURIString (const False) s
+        {-# NOINLINE escaped #-}
 
 testEscapeURIString = TF.testGroup "testEscapeURIString"
   [ TF.testCase "testEscapeURIString01" testEscapeURIString01
