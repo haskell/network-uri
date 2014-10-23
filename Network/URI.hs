@@ -1226,7 +1226,7 @@ normalizeEscape ('%':h1:h2:cs)
 normalizeEscape (c:cs)         = c:normalizeEscape cs
 normalizeEscape []             = []
 
--- |Path segment normalization; cf. RFC3986 section 6.2.2.4
+-- |Path segment normalization; cf. RFC3986 section 6.2.2.3
 --
 normalizePathSegments :: String -> String
 normalizePathSegments uristr = normstr juri
