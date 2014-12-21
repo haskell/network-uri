@@ -139,6 +139,11 @@ import Data.Data (Data)
 import Data.Generics (Data)
 #endif
 
+#if MIN_VERSION_base(4,6,0)
+import GHC.Generics (Generic)
+#else
+#endif
+
 ------------------------------------------------------------
 --  The URI datatype
 ------------------------------------------------------------
@@ -158,7 +163,11 @@ data URI = URI
     , uriPath       :: String           -- ^ @\/ghc@
     , uriQuery      :: String           -- ^ @?query@
     , uriFragment   :: String           -- ^ @#frag@
+#if MIN_VERSION_base(4,6,0)
+    } deriving (Eq, Ord, Typeable, Data, Generic)
+#else
     } deriving (Eq, Ord, Typeable, Data)
+#endif
 
 instance NFData URI where
     rnf (URI s a p q f)
