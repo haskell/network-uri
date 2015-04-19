@@ -36,7 +36,7 @@ library
     Network.URI
   build-depends:
     base >= 3 && < 5,
-    deepseq >= 1.1 && < 1.4,
+    deepseq >= 1.1 && < 1.5,
     parsec >= 3.0 && < 3.2
   default-extensions: CPP, DeriveDataTypeable
  if impl(ghc >= 7.6) {
