@@ -40,7 +40,7 @@ library
     parsec >= 3.0 && < 3.2
   default-extensions: CPP, DeriveDataTypeable
   if impl(ghc >= 7.6)
-    default-extensions: DeriveGeneric  -- Here Cabal 1.16 spuriously warns.
+    default-extensions: DeriveGeneric
   ghc-options: -Wall -fwarn-tabs
   default-language: Haskell98
 
