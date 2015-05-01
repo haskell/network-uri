@@ -1,5 +1,5 @@
 name:                network-uri
-version:             2.6.0.1
+version:             2.6.0.2
 synopsis:            URI manipulation
 description:
   This package provides an URI manipulation inteface.
@@ -40,7 +40,7 @@ library
     parsec >= 3.0 && < 3.2
   default-extensions: CPP, DeriveDataTypeable
   if impl(ghc >= 7.6)
-    default-extensions: DeriveGeneric
+    default-extensions: DeriveGeneric  -- Here Cabal 1.16 spuriously warns.
   ghc-options: -Wall -fwarn-tabs
   default-language: Haskell98
 
