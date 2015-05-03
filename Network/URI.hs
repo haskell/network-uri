@@ -557,7 +557,7 @@ ipv4address =
         ; a2 <- decOctet ; void $ char '.'
         ; a3 <- decOctet ; void $ char '.'
         ; a4 <- decOctet
-        ; void $ notFollowedBy regName
+        ; void $ notFollowedBy nameChar
         ; return $ a1++"."++a2++"."++a3++"."++a4
         }
     <?> "IPv4 Address"
@@ -573,10 +573,15 @@ decOctet =
 
 regName :: URIParser String
 regName =
-    do  { ss <- countMinMax 0 255 ( unreservedChar <|> escaped <|> subDelims )
+    do  { ss <- countMinMax 0 255 nameChar
         ; return $ concat ss
         }
     <?> "Registered name"
+
+
+nameChar :: URIParser String
+nameChar = (unreservedChar <|> escaped <|> subDelims)
+    <?> "Name character"
 
 --  RFC3986, section 3.2.3
 
