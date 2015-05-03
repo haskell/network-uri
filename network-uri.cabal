@@ -1,5 +1,5 @@
 name:                network-uri
-version:             2.6.0.2
+version:             2.6.0.3
 synopsis:            URI manipulation
 description:
   This package provides an URI manipulation inteface.
