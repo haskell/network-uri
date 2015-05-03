@@ -39,7 +39,9 @@ script:
  - cabal build
 
  - cabal test
- - cabal check
+ # Disable cabal check for now because it spuriously fails with cabal-1.16, 
+ # not recognizing the DeriveGeneric extension.
+# - cabal check
 
  # tests that a source-distribution can be generated
  - cabal sdist
