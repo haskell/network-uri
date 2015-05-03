@@ -125,7 +125,7 @@ import Text.ParserCombinators.Parsec
     )
 
 import Control.Applicative
-import Control.Monad (MonadPlus(..), void)
+import Control.Monad (MonadPlus(..))
 import Data.Traversable (sequenceA)
 import Control.DeepSeq (NFData(rnf), deepseq)
 import Data.Char (ord, chr, isHexDigit, toLower, toUpper, digitToInt)
@@ -380,8 +380,8 @@ uri =
         -- ; ua <- option Nothing ( do { try (string "//") ; uauthority } )
         -- ; up <- upath
         ; (ua,up) <- hierPart
-        ; uq <- option "" ( do { void $ char '?' ; uquery    } )
-        ; uf <- option "" ( do { void $ char '#' ; ufragment } )
+        ; uq <- option "" ( do { _ <- char '?' ; uquery    } )
+        ; uf <- option "" ( do { _ <- char '#' ; ufragment } )
         ; return $ URI
             { uriScheme    = us
             , uriAuthority = ua
@@ -393,7 +393,7 @@ uri =
 
 hierPart :: URIParser ((Maybe URIAuth),String)
 hierPart =
-        do  { void $ try (string "//")
+        do  { _ <- try (string "//")
             ; ua <- uauthority
             ; up <- pathAbEmpty
             ; return (ua,up)
@@ -412,7 +412,7 @@ hierPart =
 uscheme :: URIParser String
 uscheme =
     do  { s <- oneThenMany alphaChar (satisfy isSchemeChar)
-        ; void $ char ':'
+        ; _ <- char ':'
         ; return $ s++":"
         }
 
@@ -435,7 +435,7 @@ uauthority =
 userinfo :: URIParser String
 userinfo =
     do  { uu <- many (uchar ";:&=+$,")
-        ; void $ char '@'
+        ; _ <- char '@'
         ; return (concat uu ++"@")
         }
 
@@ -446,18 +446,18 @@ host = ipLiteral <|> try ipv4address <|> regName
 
 ipLiteral :: URIParser String
 ipLiteral =
-    do  { void $ char '['
+    do  { _ <- char '['
         ; ua <- ( ipv6address <|> ipvFuture )
-        ; void $ char ']'
+        ; _ <- char ']'
         ; return $ "[" ++ ua ++ "]"
         }
     <?> "IP address literal"
 
 ipvFuture :: URIParser String
 ipvFuture =
-    do  { void $ char 'v'
+    do  { _ <- char 'v'
         ; h <- hexDigitChar
-        ; void $ char '.'
+        ; _ <- char '.'
         ; a <- many1 (satisfy isIpvFutureChar)
         ; return $ 'v':h:'.':a
         }
@@ -473,54 +473,54 @@ ipv6address =
                 ; return $ concat a2 ++ a3
                 } )
     <|> try ( do
-                { void $ string "::"
+                { _ <- string "::"
                 ; a2 <- count 5 h4c
                 ; a3 <- ls32
                 ; return $ "::" ++ concat a2 ++ a3
                 } )
     <|> try ( do
                 { a1 <- opt_n_h4c_h4 0
-                ; void $ string "::"
+                ; _ <- string "::"
                 ; a2 <- count 4 h4c
                 ; a3 <- ls32
                 ; return $ a1 ++ "::" ++ concat a2 ++ a3
                 } )
     <|> try ( do
                 { a1 <- opt_n_h4c_h4 1
-                ; void $ string "::"
+                ; _ <- string "::"
                 ; a2 <- count 3 h4c
                 ; a3 <- ls32
                 ; return $ a1 ++ "::" ++ concat a2 ++ a3
                 } )
     <|> try ( do
                 { a1 <- opt_n_h4c_h4 2
-                ; void $ string "::"
+                ; _ <- string "::"
                 ; a2 <- count 2 h4c
                 ; a3 <- ls32
                 ; return $ a1 ++ "::" ++ concat a2 ++ a3
                 } )
     <|> try ( do
                 { a1 <- opt_n_h4c_h4 3
-                ; void $ string "::"
+                ; _ <- string "::"
                 ; a2 <- h4c
                 ; a3 <- ls32
                 ; return $ a1 ++ "::" ++ a2 ++ a3
                 } )
     <|> try ( do
                 { a1 <- opt_n_h4c_h4 4
-                ; void $ string "::"
+                ; _ <- string "::"
                 ; a3 <- ls32
                 ; return $ a1 ++ "::" ++ a3
                 } )
     <|> try ( do
                 { a1 <- opt_n_h4c_h4 5
-                ; void $ string "::"
+                ; _ <- string "::"
                 ; a3 <- h4
                 ; return $ a1 ++ "::" ++ a3
                 } )
     <|> try ( do
                 { a1 <- opt_n_h4c_h4 6
-                ; void $ string "::"
+                ; _ <- string "::"
                 ; return $ a1 ++ "::"
                 } )
     <?> "IPv6 address"
@@ -543,8 +543,8 @@ ls32 =  try ( do
 h4c :: URIParser String
 h4c = try $
     do  { a1 <- h4
-        ; void $ char ':'
-        ; void $ notFollowedBy (char ':')
+        ; _ <- char ':'
+        ; _ <- notFollowedBy (char ':')
         ; return $ a1 ++ ":"
         }
 
@@ -553,11 +553,11 @@ h4 = countMinMax 1 4 hexDigitChar
 
 ipv4address :: URIParser String
 ipv4address =
-    do  { a1 <- decOctet ; void $ char '.'
-        ; a2 <- decOctet ; void $ char '.'
-        ; a3 <- decOctet ; void $ char '.'
+    do  { a1 <- decOctet ; _ <- char '.'
+        ; a2 <- decOctet ; _ <- char '.'
+        ; a3 <- decOctet ; _ <- char '.'
         ; a4 <- decOctet
-        ; void $ notFollowedBy nameChar
+        ; _ <- notFollowedBy nameChar
         ; return $ a1++"."++a2++"."++a3++"."++a4
         }
     <?> "IPv4 Address"
@@ -587,7 +587,7 @@ nameChar = (unreservedChar <|> escaped <|> subDelims)
 
 port :: URIParser String
 port =
-    do  { void $ char ':'
+    do  { _ <- char ':'
         ; p <- many digitChar
         ; return (':':p)
         }
@@ -630,7 +630,7 @@ pathAbEmpty =
 
 pathAbs :: URIParser String
 pathAbs =
-    do  { void $ char '/'
+    do  { _ <- char '/'
         ; ss <- option "" pathRootLess
         ; return $ '/':ss
         }
@@ -651,7 +651,7 @@ pathRootLess =
 
 slashSegment :: URIParser String
 slashSegment =
-    do  { void $ char '/'
+    do  { _ <- char '/'
         ; s <- segment
         ; return ('/':s)
         }
@@ -723,8 +723,8 @@ relativeRef =
         -- ; ua <- option Nothing ( do { try (string "//") ; uauthority } )
         -- ; up <- upath
         ; (ua,up) <- relativePart
-        ; uq <- option "" ( do { void $ char '?' ; uquery    } )
-        ; uf <- option "" ( do { void $ char '#' ; ufragment } )
+        ; uq <- option "" ( do { _ <- char '?' ; uquery    } )
+        ; uf <- option "" ( do { _ <- char '#' ; ufragment } )
         ; return $ URI
             { uriScheme    = ""
             , uriAuthority = ua
@@ -736,7 +736,7 @@ relativeRef =
 
 relativePart :: URIParser ((Maybe URIAuth),String)
 relativePart =
-        do  { void $ try (string "//")
+        do  { _ <- try (string "//")
             ; ua <- uauthority
             ; up <- pathAbEmpty
             ; return (ua,up)
@@ -758,7 +758,7 @@ absoluteURI =
         -- ; ua <- option Nothing ( do { try (string "//") ; uauthority } )
         -- ; up <- upath
         ; (ua,up) <- hierPart
-        ; uq <- option "" ( do { void $ char '?' ; uquery    } )
+        ; uq <- option "" ( do { _ <- char '?' ; uquery    } )
         ; return $ URI
             { uriScheme    = us
             , uriAuthority = ua
