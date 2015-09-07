@@ -2,7 +2,7 @@ name:                network-uri
 version:             2.6.0.3
 synopsis:            URI manipulation
 description:
-  This package provides an URI manipulation inteface.
+  This package provides an URI manipulation interface.
   .
   In network-2.6 the @Network.URI@ module was split off from the
   network package into this package. If you're using the @Network.URI@
