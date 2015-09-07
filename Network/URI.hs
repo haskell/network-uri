@@ -126,11 +126,14 @@ import Text.ParserCombinators.Parsec
 
 import Control.Applicative
 import Control.Monad (MonadPlus(..))
-import Data.Traversable (sequenceA)
 import Control.DeepSeq (NFData(rnf), deepseq)
 import Data.Char (ord, chr, isHexDigit, toLower, toUpper, digitToInt)
 import Data.Bits ((.|.),(.&.),shiftL,shiftR)
 import Numeric (showIntAtBase)
+
+#if !MIN_VERSION_base(4,8,0)
+import Data.Traversable (sequenceA)
+#endif
 
 import Data.Typeable (Typeable)
 #if MIN_VERSION_base(4,0,0)
