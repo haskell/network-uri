@@ -874,11 +874,15 @@ isAllowedInURI c = isReserved c || isUnreserved c || c == '%' -- escape char
 
 -- | Returns 'True' if the character is allowed unescaped in a URI.
 --
+-- >>> escapeURIString isUnescapedInURI "http://haskell.org:80?some_param=true&other_param=їґ"
+-- "http://haskell.org:80?some_param=true&other_param=%D1%97%D2%91"
 isUnescapedInURI :: Char -> Bool
 isUnescapedInURI c = isReserved c || isUnreserved c
 
 -- | Returns 'True' if the character is allowed unescaped in a URI component.
 --
+-- >>> escapeURIString isUnescapedInURIComponent "http://haskell.org:80?some_param=true&other_param=їґ"
+-- "http%3A%2F%2Fhaskell.org%3A80%3Fsome_param%3Dtrue%26other_param%3D%D1%97%D2%91"
 isUnescapedInURIComponent :: Char -> Bool
 isUnescapedInURIComponent c = not (isReserved c || not (isUnescapedInURI c))
 
