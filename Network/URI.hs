@@ -102,7 +102,7 @@ module Network.URI
     , isUnescapedInURIComponent
     , escapeURIChar
     , escapeURIString
-    , segmentsURI
+    , pathSegments
     , unEscapeString
 
     -- * URI Normalization functions
@@ -1095,8 +1095,8 @@ segments = unfoldr nextSegmentMaybe
         nextSegmentMaybe [] = Nothing
         nextSegmentMaybe ps = Just $ nextSegment ps
 
-segmentsURI :: URI -> [String]
-segmentsURI = segments . uriPath
+pathSegments :: URI -> [String]
+pathSegments = segments . uriPath
 
 --  Split last (name) segment from path, returning (path,name)
 splitLast :: String -> (String,String)
