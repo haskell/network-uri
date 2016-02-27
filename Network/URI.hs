@@ -1092,10 +1092,8 @@ nextSegment ps =
 segments :: String -> [String]
 segments = unfoldr nextSegmentMaybe
     where
-        nextSegmentMaybe ('/':ps) = next ps --So that we do not get empty segments
-        nextSegmentMaybe ps = next ps
-        next ps =
-            case break (=='/') ps of
+        nextSegmentMaybe ps =
+            case break (=='/') ({- Get rid of empty segments -} snd $ break (/='/') ps) of
                 (r,'/':ps1) -> Just (r,ps1)
                 (_,_)       -> Nothing
 
