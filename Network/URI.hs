@@ -1092,8 +1092,12 @@ nextSegment ps =
 segments :: String -> [String]
 segments = unfoldr nextSegmentMaybe
     where
-        nextSegmentMaybe [] = Nothing
-        nextSegmentMaybe ps = Just $ nextSegment ps
+        nextSegmentMaybe ('/':ps) = next ps --So that we do not get empty segments
+        nextSegmentMaybe ps = next ps
+        next ps =
+            case break (=='/') ps of
+                (r,'/':ps1) -> Just (r,ps1)
+                (_,_)       -> Nothing
 
 pathSegments :: URI -> [String]
 pathSegments = segments . uriPath
