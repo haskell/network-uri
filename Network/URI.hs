@@ -1097,6 +1097,7 @@ segments = unfoldr nextSegmentMaybe
                 (r,'/':ps1) -> Just (r,ps1)
                 (_,_)       -> Nothing
 
+-- | Splits a 'URI' into its path components.
 pathSegments :: URI -> [String]
 pathSegments = segments . uriPath
 
