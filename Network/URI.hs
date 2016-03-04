@@ -102,7 +102,6 @@ module Network.URI
     , isUnescapedInURIComponent
     , escapeURIChar
     , escapeURIString
-    , pathSegments
     , unEscapeString
 
     -- * URI Normalization functions
@@ -130,7 +129,6 @@ import Control.Monad (MonadPlus(..))
 import Control.DeepSeq (NFData(rnf), deepseq)
 import Data.Char (ord, chr, isHexDigit, toLower, toUpper, digitToInt)
 import Data.Bits ((.|.),(.&.),shiftL,shiftR)
-import Data.List (unfoldr)
 import Numeric (showIntAtBase)
 
 #if !MIN_VERSION_base(4,8,0)
@@ -1088,18 +1086,6 @@ nextSegment ps =
     case break (=='/') ps of
         (r,'/':ps1) -> (r++"/",ps1)
         (r,_)       -> (r,[])
-
-segments :: String -> [String]
-segments = unfoldr nextSegmentMaybe
-    where
-        nextSegmentMaybe ps =
-            case break (=='/') ({- Get rid of empty segments -} snd $ break (/='/') ps) of
-                (r,'/':ps1) -> Just (r,ps1)
-                (_,_)       -> Nothing
-
--- | Splits a 'URI' into its path components.
-pathSegments :: URI -> [String]
-pathSegments = segments . uriPath
 
 --  Split last (name) segment from path, returning (path,name)
 splitLast :: String -> (String,String)
