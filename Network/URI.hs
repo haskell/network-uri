@@ -1092,9 +1092,9 @@ nextSegment ps =
 segments :: String -> [String]
 segments str = dropLeadingEmpty $ unfoldr nextSegmentMaybe str
     where
+        nextSegmentMaybe "" = Nothing
         nextSegmentMaybe ps =
             case break (=='/') ps of
-                ("", "")       -> Nothing
                 (seg, '/':ps1) -> Just (seg, ps1)
                 (seg, _)       -> Just (seg, "")
         dropLeadingEmpty ("":xs) = xs
