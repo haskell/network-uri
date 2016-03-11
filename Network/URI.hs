@@ -1090,12 +1090,15 @@ nextSegment ps =
         (r,_)       -> (r,[])
 
 segments :: String -> [String]
-segments = unfoldr nextSegmentMaybe
+segments str = case str of
+    ('/':str1) -> unfoldr nextSegmentMaybe str1 --So we don't get an beginning empty segment
+    str1 -> unfoldr nextSegmentMaybe str1
     where
         nextSegmentMaybe ps =
-            case break (=='/') ({- Get rid of empty segments -} snd $ break (/='/') ps) of
-                (r,'/':ps1) -> Just (r,ps1)
-                (_,_)       -> Nothing
+            case break (=='/') ps of
+                ("","") -> Nothing
+                (seg,'/':ps1) -> Just (seg,ps1)
+                (seg,_) -> Just (seg,"")
 
 -- | Splits a 'URI' into its path components.
 pathSegments :: URI -> [String]
