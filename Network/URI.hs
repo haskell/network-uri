@@ -102,8 +102,8 @@ module Network.URI
     , isUnescapedInURIComponent
     , escapeURIChar
     , escapeURIString
-    , pathSegments
     , unEscapeString
+    , pathSegments
 
     -- * URI Normalization functions
     , normalizeCase
@@ -1090,21 +1090,23 @@ nextSegment ps =
         (r,_)       -> (r,[])
 
 segments :: String -> [String]
-segments str = case str of
-    ('/':str1) -> unfoldr nextSegmentMaybe str1 --So we don't get an beginning empty segment
-    str1 -> unfoldr nextSegmentMaybe str1
+segments str = dropLeadingEmpty $ unfoldr nextSegmentMaybe str
     where
         nextSegmentMaybe ps =
             case break (=='/') ps of
-                ("","") -> Nothing
-                (seg,'/':ps1) -> Just (seg,ps1)
-                (seg,_) -> Just (seg,"")
+                ("", "")       -> Nothing
+                (seg, '/':ps1) -> Just (seg, ps1)
+                (seg, _)       -> Just (seg, "")
+        dropLeadingEmpty ("":xs) = xs
+        dropLeadingEmpty xs      = xs
 
--- | Splits a 'URI' into its path components.
+-- | Returns the segments of the path component. E.g.,
+--    pathSegments <$> parseURI "http://example.org/foo/bar/baz"
+-- == ["foo", "bar", "baz"]
 pathSegments :: URI -> [String]
 pathSegments = segments . uriPath
 
---  Split last (name) segment from path, returning (path,name)
+-- | Split last (name) segment from path, returning (path,name)
 splitLast :: String -> (String,String)
 splitLast p = (reverse revpath,reverse revname)
     where

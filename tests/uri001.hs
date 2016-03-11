@@ -48,11 +48,13 @@ import Network.URI
     , isUnescapedInURIComponent
     , isUnescapedInURI, escapeURIString, unEscapeString
     , normalizeCase, normalizeEscape, normalizePathSegments
+    , pathSegments
     )
 
 import Test.HUnit
 
 import Data.Maybe (fromJust)
+import Data.List (intercalate)
 import System.IO (openFile, IOMode(WriteMode), hClose)
 import qualified Test.Framework as TF
 import qualified Test.Framework.Providers.HUnit as TF
@@ -1259,6 +1261,48 @@ testIsRelative = TF.testGroup "testIsRelative"
   , TF.testCase "testIsRelative04" $ testUriIsRelative "?what=that"
   ]
 
+testPathSegmentsRoundTrip :: URI -> Assertion
+testPathSegmentsRoundTrip u =
+  let segs = pathSegments u
+
+      dropSuffix _suf []              = []
+      dropSuffix suf [x] | suf == x   = []
+                         | otherwise = [x]
+      dropSuffix suf (x:xs)          = x : dropSuffix suf xs
+
+      dropPrefix _pre []                 = []
+      dropPrefix pre (x:xs) | pre == x   = xs
+                            | otherwise = (x:xs)
+      strippedUriPath = dropSuffix '/' $ dropPrefix '/' $ uriPath u
+  in
+     (Data.List.intercalate "/" segs @?= strippedUriPath)
+
+assertJust _f Nothing = assertFailure "URI failed to parse"
+assertJust f  (Just x) = f x
+
+testPathSegments = TF.testGroup "testPathSegments"
+  [ TF.testCase "testPathSegments03" $
+        assertJust testPathSegmentsRoundTrip $ parseURIReference ""
+  , TF.testCase "testPathSegments04" $
+        assertJust testPathSegmentsRoundTrip $ parseURIReference "/"
+  , TF.testCase "testPathSegments05" $
+        assertJust testPathSegmentsRoundTrip $ parseURIReference "//"
+  , TF.testCase "testPathSegments06" $
+        assertJust testPathSegmentsRoundTrip $ parseURIReference "foo//bar/"
+  , TF.testCase "testPathSegments07" $
+        assertJust testPathSegmentsRoundTrip $ parseURIReference "/foo//bar/"
+  , TF.testCase "testPathSegments03" $
+        assertJust testPathSegmentsRoundTrip $ parseURI "http://example.org"
+  , TF.testCase "testPathSegments04" $
+        assertJust testPathSegmentsRoundTrip $ parseURI "http://example.org/"
+  , TF.testCase "testPathSegments05" $
+        assertJust testPathSegmentsRoundTrip $ parseURI "http://example.org//"
+  , TF.testCase "testPathSegments06" $
+        assertJust testPathSegmentsRoundTrip $ parseURI "http://ex.ca/foo//bar/"
+  , TF.testCase "testPathSegments07" $
+        assertJust testPathSegmentsRoundTrip $ parseURI "http://ex.ca/foo//bar/"
+  ]
+
 -- Full test suite
 allTests =
   [ testURIRefSuite
@@ -1274,6 +1318,7 @@ allTests =
   , testAltFn
   , testIsAbsolute
   , testIsRelative
+  , testPathSegments
   ]
 
 main = TF.defaultMain allTests
