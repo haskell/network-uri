@@ -44,7 +44,7 @@ script:
  - cabal test
  # Disable cabal check for now because it spuriously fails with cabal-1.16,
  # not recognizing the DeriveGeneric extension.
-# - cabal check
+ - if [ $CABALVER != 1.16 ]; then cabal check; fi
 
  # tests that a source-distribution can be generated
  - cabal sdist
