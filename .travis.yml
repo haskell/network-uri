@@ -8,6 +8,7 @@ env:
  - GHCVER=7.4.2 CABALVER=1.16
  - GHCVER=7.6.3 CABALVER=1.16
  - GHCVER=7.8.2 CABALVER=1.18
+ - GHCVER=7.10.3 CABALVER=1.20
  - GHCVER=head  CABALVER=1.20
 
 matrix:
@@ -39,7 +40,7 @@ script:
  - cabal build
 
  - cabal test
- # Disable cabal check for now because it spuriously fails with cabal-1.16, 
+ # Disable cabal check for now because it spuriously fails with cabal-1.16,
  # not recognizing the DeriveGeneric extension.
 # - cabal check
 
