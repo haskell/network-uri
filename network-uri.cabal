@@ -60,6 +60,21 @@ test-suite uri
   ghc-options: -Wall -fwarn-tabs
   default-language: Haskell98
 
+test-suite uri-bench
+  hs-source-dirs: tests
+  main-is: uri-bench.hs
+  type: exitcode-stdio-1.0
+
+  build-depends:
+    base < 5,
+    HUnit,
+    network-uri,
+    criterion,
+    deepseq
+
+  ghc-options: -Wall -fwarn-tabs
+  default-language: Haskell98
+
 source-repository head
   type:     git
   location: git://github.com/haskell/network-uri.git
