@@ -9,11 +9,12 @@
 --  Stability   :  provisional
 --  Portability :  portable
 --
---  This module defines functions for handling URIs.  It presents substantially the
---  same interface as the older GHC Network.URI module, but is implemented using
---  Parsec rather than a Regex library that is not available with Hugs.  The internal
---  representation of URI has been changed so that URI strings are more
---  completely preserved when round-tripping to a URI value and back.
+--  This module defines functions for handling URIs.  It presents
+--  substantially the same interface as the older GHC Network.URI module, but
+--  is implemented using Parsec rather than a Regex library that is not
+--  available with Hugs.  The internal representation of URI has been changed
+--  so that URI strings are more completely preserved when round-tripping to a
+--  URI value and back.
 --
 --  In addition, four methods are provided for parsing different
 --  kinds of URI string (as noted in RFC3986):
@@ -1089,6 +1090,7 @@ nextSegment ps =
         (r,'/':ps1) -> (r++"/",ps1)
         (r,_)       -> (r,[])
 
+-- | The segments of the path component of a URI. E.g.,
 segments :: String -> [String]
 segments str = dropLeadingEmpty $ unfoldr nextSegmentMaybe str
     where
@@ -1165,47 +1167,51 @@ relativeFrom uabs base
             where
                 (p1,p2) = splitLast p
 
+-- | Calculate the path to the first argument, from the second argument.
 relPathFrom :: String -> String -> String
 relPathFrom []   _    = "/"
 relPathFrom pabs []   = pabs
-relPathFrom pabs base =                 -- Construct a relative path segments
-    if sa1 == sb1                       -- if the paths share a leading segment
-        then if (sa1 == "/")            -- other than a leading '/'
-            then if (sa2 == sb2)
-                then relPathFrom1 ra2 rb2
-                else pabs
-            else relPathFrom1 ra1 rb1
-        else pabs
+relPathFrom pabs base =
+    if sa1 == sb1                       -- If the first segments are equal
+        then if (sa1 == "/")              -- and they're absolute,
+            then if (sa2 == sb2)            -- then if the 2nd segs are equal,
+                then relPathFrom1 ra2 rb2   -- relativize from there.
+                else
+                   pabs                     -- Otherwise it's not worth trying.
+            else relPathFrom1 ra1 rb1     -- If same & relative, relativize.
+        else pabs                       -- If 1st segs not equal, just use pabs.
     where
         (sa1,ra1) = nextSegment pabs
         (sb1,rb1) = nextSegment base
         (sa2,ra2) = nextSegment ra1
         (sb2,rb2) = nextSegment rb1
 
---  relPathFrom1 strips off trailing names from the supplied paths,
---  and calls difPathFrom to find the relative path from base to
---  target
+--  relPathFrom1 strips off trailing names from the supplied paths, and finds
+--  the relative path from base to target.
 relPathFrom1 :: String -> String -> String
 relPathFrom1 pabs base = relName
     where
+        -- Relative paths are reckoned without the basename, so split those off.
         (sa,na) = splitLast pabs
         (sb,nb) = splitLast base
         rp      = relSegsFrom sa sb
         relName = if null rp then
+                      -- If the relative path is empty, and the basenames are
+                      -- the same, then the paths must be exactly the same.
                       if (na == nb) then ""
+                      -- If the name is vulnerable to being misinterpreted,
+                      -- add a dot segment in advance to protect it.
                       else if protect na then "./"++na
                       else na
                   else
                       rp++na
-        -- Precede name with some path if it is null or contains a ':'
+        -- If a single-segment path is null or contains a ':', it needs
+        -- "protection" from being interpreted as a different kind of URL.
         protect s = null s || ':' `elem` s
 
---  relSegsFrom discards any common leading segments from both paths,
---  then invokes difSegsFrom to calculate a relative path from the end
+--  relSegsFrom discards any equal leading segments from two *directory*
+--  paths, then invokes difSegsFrom to calculate a relative path from the end
 --  of the base path to the end of the target path.
---  The final name is handled separately, so this deals only with
---  "directory" segtments.
---
 relSegsFrom :: String -> String -> String
 {-
 relSegsFrom sabs base
@@ -1221,14 +1227,8 @@ relSegsFrom sabs base =
         (sa1,ra1) = nextSegment sabs
         (sb1,rb1) = nextSegment base
 
---  difSegsFrom calculates a path difference from base to target,
---  not including the final name at the end of the path
---  (i.e. results always ends with '/')
---
---  This function operates under the invariant that the supplied
---  value of sabs is the desired path relative to the beginning of
---  base.  Thus, when base is empty, the desired path has been found.
---
+-- Given two paths @a@, @b@, count out the necessary number of ".." segments
+-- to get from the depth of @b@ to the path @a@.
 difSegsFrom :: String -> String -> String
 {-
 difSegsFrom sabs base
