@@ -695,7 +695,7 @@ uchar extras =
 
 uquery :: URIParser String
 uquery =
-    do  { ss <- many $ uchar (":@"++"/?")
+    do  { ss <- many $ uchar (":@[]"++"/?")
         ; return $ '?':concat ss
         }
 
