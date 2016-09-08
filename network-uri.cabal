@@ -2,12 +2,24 @@ name:                network-uri
 version:             2.6.1.0
 synopsis:            URI manipulation
 description:
-  This package provides an URI manipulation interface.
+  This package provides facilities for parsing and unparsing URIs, and creating
+  and resolving relative URI references, closely following the URI spec, IETF
+  RFC 3986 [1].
+  .
+  == Backward-compatibility
   .
   In network-2.6 the @Network.URI@ module was split off from the
   network package into this package. If you're using the @Network.URI@
-  module you can automatically get it from the right package by adding
-  this to your .cabal file:
+  module you can be backward compatible and automatically get it from
+  the right package by using the following pseudo-package in your .cabal
+  file's build-depends (along with dependencies for both network-uri and
+  network):
+  .
+  >  build-depends:
+  >     network-uri-flag == 0.1.*
+  .
+  Or you can do the same manually by adding this boilerplate to your
+  .cabal file:
   .
   > flag network-uri
   >   description: Get Network.URI from the network-uri package
@@ -22,6 +34,10 @@ description:
   .
   That is, get the module from either network < 2.6 or from
   network-uri >= 2.6.
+  .
+  == References
+  (3) <http://www.ietf.org/rfc/rfc3986.txt>
+
 homepage:            https://github.com/haskell/network-uri
 bug-reports:         https://github.com/haskell/network-uri/issues
 license:             BSD3
