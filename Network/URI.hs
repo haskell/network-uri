@@ -446,6 +446,7 @@ userinfo =
         }
 
 --  RFC3986, section 3.2.2
+--  RFC6874, section 2
 
 host :: URIParser String
 host = ipLiteral <|> try ipv4address <|> regName
@@ -453,7 +454,7 @@ host = ipLiteral <|> try ipv4address <|> regName
 ipLiteral :: URIParser String
 ipLiteral =
     do  { _ <- char '['
-        ; ua <- ( ipv6address <|> ipvFuture )
+        ; ua <- ( ipv6addrz <|> ipvFuture )
         ; _ <- char ']'
         ; return $ "[" ++ ua ++ "]"
         }
@@ -470,6 +471,12 @@ ipvFuture =
 
 isIpvFutureChar :: Char -> Bool
 isIpvFutureChar c = isUnreserved c || isSubDelims c || (c==';')
+
+zoneid :: URIParser String
+zoneid = concat <$> many1 (unreservedChar <|> escaped)
+
+ipv6addrz :: URIParser String
+ipv6addrz = (++) <$> ipv6address <*> option "" (try $ (++) <$> string "%25" <*> zoneid)
 
 ipv6address :: URIParser String
 ipv6address =

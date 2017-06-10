@@ -135,6 +135,7 @@ testURIRef026 = testURIRef AbsId "http://[::FFFF:129.144.52.38]:80/index.html"
 testURIRef027 = testURIRef AbsId "http://[2010:836B:4179::836B:4179]"
 testURIRef028 = testURIRef RelRf "//[2010:836B:4179::836B:4179]"
 testURIRef029 = testURIRef InvRf "[2010:836B:4179::836B:4179]"
+testURIRef030 = testURIRef AbsId "http://[fe80::ff:fe00:1%25eth0]"
 -- RFC2396 test cases
 testURIRef031 = testURIRef RelRf "./aaa"
 testURIRef032 = testURIRef RelRf "../aaa"
