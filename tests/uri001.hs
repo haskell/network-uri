@@ -49,6 +49,7 @@ import Network.URI
     , isUnescapedInURI, escapeURIString, unEscapeString
     , normalizeCase, normalizeEscape, normalizePathSegments
     , pathSegments
+    , mkURIAuth, mkURI, nullAuth
     )
 
 import Test.HUnit
@@ -1304,6 +1305,95 @@ testPathSegments = TF.testGroup "testPathSegments"
         assertJust testPathSegmentsRoundTrip $ parseURI "http://ex.ca/foo//bar/"
   ]
 
+-- Smart constructor tests
+
+-- mkURIAuth tests
+
+-- No user info or port
+testMkURIAuth01 = testEq "testMkURIAuth01" expected result where
+  expected = URIAuth {uriUserInfo = "", uriRegName = "example.com", uriPort = ""}
+  result = mkURIAuth Nothing (Just "example.com") Nothing
+
+-- Username only, no port
+testMkURIAuth02 = testEq "testMkURIAuth02" expected result where
+  expected = URIAuth {uriUserInfo = "user@", uriRegName = "example.com", uriPort = ""}
+  result = mkURIAuth (Just (Left "user")) (Just "example.com") Nothing
+
+-- Username and password, no port
+testMkURIAuth03 = testEq "testMkURIAuth03" expected result where
+  expected = URIAuth {uriUserInfo = "user:pass@", uriRegName = "example.com", uriPort = ""}
+  result = mkURIAuth (Just (Right ("user", "pass"))) (Just "example.com") Nothing
+
+-- With a port
+testMkURIAuth04 = testEq "testMkURIAuth04" expected result where
+  expected = URIAuth {uriUserInfo = "", uriRegName = "example.com", uriPort = ":80"}
+  result = mkURIAuth Nothing (Just "example.com") (Just 80)
+
+-- mkURI tests
+
+-- Server name, path
+testMkURI01 = testEq "testMkURI01" expected result where
+  Just expected = parseURI "https://example.com:443/page"
+  auth = mkURIAuth Nothing (Just "example.com") (Just 443)
+  result = mkURI "https" auth (Just "page") Nothing Nothing
+
+-- Server name, path with slashes
+testMkURI02 = testEq "testMkURI02" expected result where
+  Just expected = parseURI "https://example.com/page1/page2"
+  auth = mkURIAuth Nothing (Just "example.com") Nothing
+  result = mkURI "https" auth (Just "page1/page2") Nothing Nothing
+
+-- Server name, path, query
+testMkURI03 = testEq "testMkURI03" expected result where
+  Just expected = parseURI "https://example.com:443/page?query"
+  auth = mkURIAuth Nothing (Just "example.com") (Just 443)
+  result = mkURI "https" auth (Just "page") (Just "query") Nothing
+
+-- Server name, path, query, fragment
+testMkURI04 = testEq "testMkURI04" expected result where
+  Just expected = parseURI "https://example.com:443/page?query#frag"
+  auth = mkURIAuth Nothing (Just "example.com") (Just 443)
+  result = mkURI "https" auth (Just "page") (Just "query") (Just "frag")
+
+-- Server name, path, empty fragment
+testMkURI05 = testEq "testMkURI05" expected result where
+  Just expected = parseURI "https://example.com:443/page#"
+  auth = mkURIAuth Nothing (Just "example.com") (Just 443)
+  result = mkURI "https" auth (Just "page") Nothing (Just "")
+
+-- Trailing : on scheme is optional
+testMkURI06 = testEq "testMkURI06" uri1 uri2 where
+  uri1 = mkURI "https" nullAuth Nothing Nothing Nothing
+  uri2 = mkURI "https:" nullAuth Nothing Nothing Nothing
+
+-- Preceding / on path is optional
+testMkURI07 = testEq "testMkURI07" expected result where
+  Just expected = parseURI "https://example.com:443/page"
+  auth = mkURIAuth Nothing (Just "example.com") (Just 443)
+  result = mkURI "https" auth (Just "/page") Nothing Nothing
+
+-- Can use null auth
+testMkURI08 = testEq "testMkURI08" expected result where
+  Just expected = parseURI "file:///foo/bar"
+  result = mkURI "file" nullAuth (Just "foo/bar") Nothing Nothing
+
+testSmartConstructors = TF.testGroup "testSmartConstructors"
+  [ TF.testCase "testMkURIAuth01" testMkURIAuth01
+  , TF.testCase "testMkURIAuth02" testMkURIAuth02
+  , TF.testCase "testMkURIAuth03" testMkURIAuth03
+  , TF.testCase "testMkURIAuth04" testMkURIAuth04
+
+  , TF.testCase "testMkURI01" testMkURI01
+  , TF.testCase "testMkURI02" testMkURI02
+  , TF.testCase "testMkURI03" testMkURI03
+  , TF.testCase "testMkURI04" testMkURI04
+  , TF.testCase "testMkURI05" testMkURI05
+  , TF.testCase "testMkURI06" testMkURI06
+  , TF.testCase "testMkURI07" testMkURI07
+  , TF.testCase "testMkURI08" testMkURI08
+  ]
+
+
 -- Full test suite
 allTests =
   [ testURIRefSuite
@@ -1320,6 +1410,7 @@ allTests =
   , testIsAbsolute
   , testIsRelative
   , testPathSegments
+  , testSmartConstructors
   ]
 
 main = TF.defaultMain allTests

@@ -65,6 +65,7 @@ module Network.URI
       URI(..)
     , URIAuth(..)
     , nullURI
+    , nullAuth
 
     -- * Parsing
     , parseURI
@@ -111,6 +112,10 @@ module Network.URI
     , normalizeEscape
     , normalizePathSegments
 
+    -- * URI Smart constructors
+    , mkURIAuth
+    , mkURI
+
     -- * Deprecated functions
     , parseabsoluteURI
     , escapeString
@@ -131,7 +136,7 @@ import Control.Monad (MonadPlus(..))
 import Control.DeepSeq (NFData(rnf), deepseq)
 import Data.Char (ord, chr, isHexDigit, toLower, toUpper, digitToInt)
 import Data.Bits ((.|.),(.&.),shiftL,shiftR)
-import Data.List (unfoldr)
+import Data.List (unfoldr, isPrefixOf, isSuffixOf)
 import Numeric (showIntAtBase)
 
 #if !MIN_VERSION_base(4,8,0)
@@ -198,6 +203,10 @@ nullURI = URI
     , uriQuery      = ""
     , uriFragment   = ""
     }
+
+-- | Blank URI auth
+nullAuth :: URIAuth
+nullAuth = URIAuth "" "" ""
 
 --  URI as instance of Show.  Note that for security reasons, the default
 --  behaviour is to suppress any userinfo field (see RFC3986, section 7.5).
@@ -1282,6 +1291,76 @@ normalizePathSegments uristr = normstr juri
         normstr Nothing  = uristr
         normstr (Just u) = show (normuri u)
         normuri u = u { uriPath = removeDotSegments (uriPath u) }
+
+------------------------------------------------------------
+--  Safer constructors
+------------------------------------------------------------
+
+-- | Add a prefix to a string, unless it already has it.
+addPrefix :: String -> String -> String
+addPrefix p s = if isPrefixOf p s then s else p ++ s
+
+-- | Add a suffix to a string, unless it already has it.
+addSuffix :: String -> String -> String
+addSuffix p s = if isSuffixOf p s then s else s ++ p
+
+-- | A smart constructor for URIAuth.
+--
+-- >>> mkURIAuth Nothing (Just "example.com") Nothing
+-- URIAuth {uriUserInfo = "", uriRegName = "example.com", uriPort = ""}
+--
+-- >>> mkURIAuth (Just (Left "user")) (Just "example.com") Nothing
+-- URIAuth {uriUserInfo = "user@", uriRegName = "example.com", uriPort = ""}
+--
+-- >>> mkURIAuth (Just (Right ("user", "pass"))) (Just "example.com") Nothing
+-- URIAuth {uriUserInfo = "user:pass@", uriRegName = "example.com", uriPort = ""}
+--
+-- >>> mkURIAuth Nothing (Just "example.com") (Just 80)
+-- URIAuth {uriUserInfo = "", uriRegName = "example.com", uriPort = ":80"}
+--
+mkURIAuth :: Maybe (Either String (String, String))
+          -- ^ Username, user/pass, or nothing.
+          -> Maybe String
+          -- ^ Server hostname (regname)
+          -> Maybe Int
+          -- ^ Port
+          -> URIAuth
+          -- ^ Construct URI auth.
+mkURIAuth mUserInfo mRegName mPort = URIAuth userInfo' regName' port'
+  where
+    userInfo' = case mUserInfo of
+      Nothing -> ""
+      Just info -> addSuffix "@" $ case info of
+        Left username -> username
+        Right (username, password) -> username ++ ":" ++ password
+    regName' = maybe "" id mRegName
+    port' = maybe "" (\i -> ":" ++ show i) mPort
+
+-- | A smart constructor for a URI.
+--
+-- >>> let auth = mkURIAuth Nothing (Just "www.example.com") (Just 443)
+-- >>> mkURI "https" auth (Just "page") Nothing Nothing
+-- https://www.example.com:443/page
+--
+-- >>> mkURI "https" auth Nothing (Just "query") Nothing
+-- https://www.example.com:443?query
+--
+-- >>> mkURI "file" nullAuth (Just "/etc/passwd") Nothing Nothing
+-- file:///etc/passwd
+--
+mkURI :: String        -- ^ Scheme
+      -> URIAuth       -- ^ Auth and server
+      -> Maybe String  -- ^ Path
+      -> Maybe String  -- ^ Query
+      -> Maybe String  -- ^ Fragment
+      -> URI           -- ^ Resulting URI object
+mkURI scheme' uriAuthority' mPath mQuery mFragment = URI {
+  uriScheme = addSuffix ":" scheme',
+  uriAuthority = Just uriAuthority',
+  uriPath = maybe "" (addPrefix "/") mPath,
+  uriQuery = maybe "" (addPrefix "?") mQuery,
+  uriFragment = maybe "" (addPrefix "#") mFragment
+  }
 
 ------------------------------------------------------------
 --  Deprecated functions
