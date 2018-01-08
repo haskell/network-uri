@@ -65,6 +65,7 @@ module Network.URI
       URI(..)
     , URIAuth(..)
     , nullURI
+    , nullURIAuth
 
     -- * Parsing
     , parseURI
@@ -197,6 +198,14 @@ nullURI = URI
     , uriPath       = ""
     , uriQuery      = ""
     , uriFragment   = ""
+    }
+
+-- |Blank URIAuth.
+nullURIAuth :: URIAuth
+nullURIAuth = URIAuth
+    { uriUserInfo   = ""
+    , uriRegName    = ""
+    , uriPort       = ""
     }
 
 --  URI as instance of Show.  Note that for security reasons, the default
