@@ -38,13 +38,14 @@ module Main where
 import Network.URI
     ( URI(..), URIAuth(..)
     , nullURI
+    , rectify, rectifyAuth
     , parseURI, parseURIReference, parseRelativeReference, parseAbsoluteURI
     , parseAbsoluteURI
     , isURI, isURIReference, isRelativeReference, isAbsoluteURI
     , uriIsAbsolute, uriIsRelative
     , relativeTo, nonStrictRelativeTo
     , relativeFrom
-    , uriToString
+    , uriToString, uriAuthToString
     , isUnescapedInURIComponent
     , isUnescapedInURI, escapeURIString, unEscapeString
     , normalizeCase, normalizeEscape, normalizePathSegments
@@ -1304,6 +1305,30 @@ testPathSegments = TF.testGroup "testPathSegments"
         assertJust testPathSegmentsRoundTrip $ parseURI "http://ex.ca/foo//bar/"
   ]
 
+testRectify = TF.testGroup "testRectify"
+  [ TF.testCase "" $ testEq "testRectify"
+    (show $ rectify $ URI { uriScheme = "http" ,
+                            uriAuthority = Just (URIAuth "ezra" "www.google.com" "80") ,
+                            uriPath = "/foo/bar" ,
+                            uriQuery = "foo=bar&baz=quz" ,
+                            uriFragment = "chap10" })
+    "http://ezra@www.google.com:80/foo/bar?foo=bar&baz=quz#chap10"
+  , -- According to RFC2986, any URL without a // does not have an authority component.
+    -- Therefore tag: URIs have all their content in the path component. This is supported
+    -- by the urn: example in section 3. Note that tag: URIs have no leading slash on their
+    -- path component.
+    TF.testCase "" $ testEq "testRectify"
+    "tag:timothy@hpl.hp.com,2001:web/externalHome"
+    (show $ rectify $ URI { uriScheme = "tag" ,
+                            uriAuthority = Nothing,
+                            uriPath = "timothy@hpl.hp.com,2001:web/externalHome",
+                            uriQuery = "" ,
+                            uriFragment = "" })
+  , TF.testCase "" $ testEq "testRectifyAuth"
+    "//ezra@www.google.com:80"
+    ((uriAuthToString id . Just . rectifyAuth $ URIAuth "ezra" "www.google.com" "80") "")
+  ]
+
 -- Full test suite
 allTests =
   [ testURIRefSuite
@@ -1320,6 +1345,7 @@ allTests =
   , testIsAbsolute
   , testIsRelative
   , testPathSegments
+  , testRectify
   ]
 
 main = TF.defaultMain allTests
