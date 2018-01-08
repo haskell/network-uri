@@ -1,4 +1,6 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric #-}
 --------------------------------------------------------------------------------
 -- |
 --  Module      :  Network.URI
@@ -65,6 +67,9 @@ module Network.URI
       URI(..)
     , URIAuth(..)
     , nullURI
+    , nullURIAuth
+
+    , rectify, rectifyAuth
 
     -- * Parsing
     , parseURI
@@ -97,7 +102,7 @@ module Network.URI
     --   The URI spec [3], section 2.4, indicates that all URI components
     --   should be escaped before they are assembled as a URI:
     --   \"Once produced, a URI is always in its percent-encoded form\"
-    , uriToString
+    , uriToString, uriAuthToString
     , isReserved, isUnreserved
     , isAllowedInURI, isUnescapedInURI
     , isUnescapedInURIComponent
@@ -131,7 +136,7 @@ import Control.Monad (MonadPlus(..))
 import Control.DeepSeq (NFData(rnf), deepseq)
 import Data.Char (ord, chr, isHexDigit, toLower, toUpper, digitToInt)
 import Data.Bits ((.|.),(.&.),shiftL,shiftR)
-import Data.List (unfoldr)
+import Data.List (unfoldr, isPrefixOf, isSuffixOf)
 import Numeric (showIntAtBase)
 
 #if !MIN_VERSION_base(4,8,0)
@@ -175,6 +180,40 @@ data URI = URI
     } deriving (Eq, Ord, Typeable, Data)
 #endif
 
+-- | Add a prefix to a string, unless it already has it.
+ensurePrefix :: String -> String -> String
+ensurePrefix p s = if isPrefixOf p s then s else p ++ s
+
+-- | Add a suffix to a string, unless it already has it.
+ensureSuffix :: String -> String -> String
+ensureSuffix p s = if isSuffixOf p s then s else s ++ p
+
+-- | Given a URIAuth in "nonstandard" form (lacking required separator characters),
+-- return one that is standard.
+rectifyAuth :: URIAuth -> URIAuth
+rectifyAuth a = URIAuth {
+  uriUserInfo = unlessEmpty (ensureSuffix "@") (uriUserInfo a),
+  uriRegName = uriRegName a,
+  uriPort = unlessEmpty (ensurePrefix ":") (uriPort a)
+  }
+
+-- | Given a URI in "nonstandard" form (lacking required separator characters),
+-- return one that is standard.
+rectify :: URI -> URI
+rectify u = URI {
+  uriScheme = ensureSuffix ":" (uriScheme u),
+  uriAuthority = fmap rectifyAuth (uriAuthority u),
+  uriPath = uriPath u,
+  uriQuery = unlessEmpty (ensurePrefix "?") (uriQuery u),
+  uriFragment = unlessEmpty (ensurePrefix "#") (uriFragment u)
+  }
+
+-- | Apply the function to the list, unless that list is empty, in
+-- which case leave it alone.
+unlessEmpty :: ([a] -> [a]) -> [a] -> [a]
+unlessEmpty _f [] = []
+unlessEmpty  f  x = f x
+
 instance NFData URI where
     rnf (URI s a p q f)
         = s `deepseq` a `deepseq` p `deepseq` q `deepseq` f `deepseq` ()
@@ -197,6 +236,14 @@ nullURI = URI
     , uriPath       = ""
     , uriQuery      = ""
     , uriFragment   = ""
+    }
+
+-- |Blank URIAuth.
+nullURIAuth :: URIAuth
+nullURIAuth = URIAuth
+    { uriUserInfo   = ""
+    , uriRegName    = ""
+    , uriPort       = ""
     }
 
 --  URI as instance of Show.  Note that for security reasons, the default
