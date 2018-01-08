@@ -7,7 +7,8 @@ module Network.URI.Strong (
   URI(..)
   , RelativeReference(..)
   , URIAuth(..)
-  , nullURI
+  , nullURI, nullRelativeReference
+  , nullURIAuth
   , validURI
   , rectify, rectifyAuth
 
@@ -27,7 +28,6 @@ module Network.URI.Strong (
 
   -- * Relative URIs
   , relativeTo
-  , nonStrictRelativeTo
   , relativeFrom
 
   -- * Operations on URI strings
@@ -100,6 +100,10 @@ instance Show RelativeReference where
 nullURI :: URI
 nullURI = URI U.nullURI
 
+-- |Blank URIAuth.
+nullURIAuth :: URIAuth
+nullURIAuth = U.nullURIAuth
+
 -- TODO: validURI should also check that the other fields are valid,
 -- namely that the delimiter characters are present on any nonempty
 -- fields.
@@ -121,7 +125,6 @@ nullRelativeReference = RelativeReference U.nullURI
 parseURI :: String -> Maybe URI
 parseURI s =
   do u <- U.parseURI s
-     guard (U.uriIsAbsolute u)
      return (URI u)
 
 parseURIReference :: String -> Maybe (Either URI RelativeReference)
@@ -170,10 +173,6 @@ isIPv4address = U.isIPv4address
 relativeTo :: RelativeReference -> URI -> URI
 relativeTo (RelativeReference rel) (URI abs) =
   wrapURI (U.relativeTo rel abs)
-
-nonStrictRelativeTo :: RelativeReference -> URI -> URI
-nonStrictRelativeTo (RelativeReference rel) (URI abs) =
-  wrapURI (U.nonStrictRelativeTo rel abs)
 
 wrapURI :: U.URI -> URI
 wrapURI u =
