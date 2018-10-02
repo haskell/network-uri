@@ -1,5 +1,5 @@
 name:                network-uri
-version:             2.6.1.0
+version:             2.6.2.0
 synopsis:            URI manipulation
 description:
   This package provides facilities for parsing and unparsing URIs, and creating
@@ -44,15 +44,17 @@ maintainer:          ezra@ezrakilty.net
 category:            Network
 build-type:          Simple
 cabal-version:       >=1.10
-tested-with: GHC==8.2.1, GHC==8.0.2, GHC==7.10.3, GHC==7.8.4, GHC==7.6.3, GHC==7.4.2, GHC==7.2.2, GHC==7.0.4
+tested-with: 	     GHC==8.2.1, GHC==8.0.2, GHC==7.10.3, GHC==7.8.4, GHC==7.6.3, GHC==7.4.2, GHC==7.2.2, GHC==7.0.4
 
 library
   exposed-modules:
     Network.URI
+    Network.URI.Static
   build-depends:
     base >= 3 && < 5,
     deepseq >= 1.1 && < 1.5,
-    parsec >= 3.0 && < 3.2
+    parsec >= 3.0 && < 3.2,
+    template-haskell
   default-extensions: CPP, DeriveDataTypeable
   if impl(ghc >= 7.6)
     default-extensions: DeriveGeneric
