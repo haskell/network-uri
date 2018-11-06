@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE RecordWildCards, TemplateHaskellQuotes, CPP #-}
 --------------------------------------------------------------------------------
 -- |
 --  Module      :  Network.URI
@@ -136,6 +136,7 @@ import Data.Char (ord, chr, isHexDigit, toLower, toUpper, digitToInt)
 import Data.Bits ((.|.),(.&.),shiftL,shiftR)
 import Data.List (unfoldr, isPrefixOf, isSuffixOf)
 import Numeric (showIntAtBase)
+import Language.Haskell.TH.Syntax (Lift(..))
 
 #if !MIN_VERSION_base(4,8,0)
 import Data.Traversable (sequenceA)
@@ -1327,6 +1328,16 @@ normalizePathSegments uristr = normstr juri
         normstr Nothing  = uristr
         normstr (Just u) = show (normuri u)
         normuri u = u { uriPath = removeDotSegments (uriPath u) }
+
+------------------------------------------------------------
+--  Lift instances to support Network.URI.Static
+------------------------------------------------------------
+
+instance Lift URI where
+    lift (URI {..}) = [| URI {..} |]
+
+instance Lift URIAuth where
+    lift (URIAuth {..}) = [| URIAuth {..} |]
 
 ------------------------------------------------------------
 --  Deprecated functions
