@@ -6,7 +6,10 @@ module Network.URI.Static
 #if __GLASGOW_HASKELL__ >= 800
     ( staticURI
     , uri
-    ) where
+    )
+#endif
+  where
+#if __GLASGOW_HASKELL__ >= 800
 
 import Language.Haskell.TH (unType)
 import Language.Haskell.TH.Lib (TExpQ)
