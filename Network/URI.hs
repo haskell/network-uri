@@ -1,4 +1,7 @@
-{-# LANGUAGE RecordWildCards, TemplateHaskellQuotes, CPP #-}
+{-# LANGUAGE RecordWildCards, CPP #-}
+#if __GLASGOW_HASKELL__ >= 800
+{-# LANGUAGE TemplateHaskellQuotes #-}
+#endif
 --------------------------------------------------------------------------------
 -- |
 --  Module      :  Network.URI
@@ -1333,11 +1336,13 @@ normalizePathSegments uristr = normstr juri
 --  Lift instances to support Network.URI.Static
 ------------------------------------------------------------
 
+#if __GLASGOW_HASKELL__ >= 800
 instance Lift URI where
     lift (URI {..}) = [| URI {..} |]
 
 instance Lift URIAuth where
     lift (URIAuth {..}) = [| URIAuth {..} |]
+#endif
 
 ------------------------------------------------------------
 --  Deprecated functions

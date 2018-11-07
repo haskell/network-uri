@@ -1,3 +1,4 @@
+#if __GLASGOW_HASKELL__ >= 800
 {-# LANGUAGE RecordWildCards, TemplateHaskellQuotes, ViewPatterns #-}
 
 module Network.URI.Static
@@ -46,3 +47,4 @@ uri = QuasiQuoter {
     quoteType = undefined,
     quoteDec = undefined
 }
+#endif
