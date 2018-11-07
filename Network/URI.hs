@@ -139,7 +139,10 @@ import Data.Char (ord, chr, isHexDigit, toLower, toUpper, digitToInt)
 import Data.Bits ((.|.),(.&.),shiftL,shiftR)
 import Data.List (unfoldr, isPrefixOf, isSuffixOf)
 import Numeric (showIntAtBase)
+
+#if __GLASGOW_HASKELL__ >= 800
 import Language.Haskell.TH.Syntax (Lift(..))
+#endif
 
 #if !MIN_VERSION_base(4,8,0)
 import Data.Traversable (sequenceA)
