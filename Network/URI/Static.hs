@@ -1,7 +1,9 @@
 #if __GLASGOW_HASKELL__ >= 800
 {-# LANGUAGE RecordWildCards, TemplateHaskellQuotes, ViewPatterns #-}
+#endif
 
 module Network.URI.Static
+#if __GLASGOW_HASKELL__ >= 800
     ( staticURI
     , uri
     ) where
