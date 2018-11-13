@@ -1,6 +1,7 @@
 #if __GLASGOW_HASKELL__ < 800
-module Network.URI.Static ()
+module Network.URI.Static () where
 #else
+
 {-# LANGUAGE RecordWildCards, TemplateHaskellQuotes, ViewPatterns #-}
 
 module Network.URI.Static
