@@ -7,8 +7,8 @@ module Network.URI.Static () where
 module Network.URI.Static
     (
     -- * Absolute URIs
-      staticURI
-    , uri
+      uri
+    , staticURI
     -- * Relative URIs
     , relativeReference
     , staticRelativeReference
