@@ -1,10 +1,10 @@
 {-# LANGUAGE Rank2Types #-}
 -- | Network uri lenses
 module Network.URI.Lens
-  ( regNameLens
-  , userInfoLens
-  , portLens
-  , uriAuthLens
+  ( uriRegNameLens
+  , uriUserInfoLens
+  , uriPortLens
+  , uriAuthorityLens
   , uriSchemeLens
   , uriPathLens
   , uriQueryLens
@@ -19,18 +19,18 @@ type Lens s t a b = forall f. Functor f => (a -> f b) -> s -> f t
 lens :: (s -> a) -> (s -> b -> t) -> Lens s t a b
 lens sa sbt afb s = sbt s <$> afb (sa s)
 
-regNameLens :: Lens' URIAuth String
-regNameLens = lens uriRegName (\parent newVal -> parent {uriRegName = newVal})
+uriRegNameLens :: Lens' URIAuth String
+uriRegNameLens = lens uriRegName (\parent newVal -> parent {uriRegName = newVal})
 
-userInfoLens :: Lens' URIAuth String
-userInfoLens =
+uriUserInfoLens :: Lens' URIAuth String
+uriUserInfoLens =
   lens uriUserInfo (\parent newVal -> parent {uriUserInfo = newVal})
 
-portLens :: Lens' URIAuth String
-portLens = lens uriPort (\parent newVal -> parent {uriPort = newVal})
+uriPortLens :: Lens' URIAuth String
+uriPortLens = lens uriPort (\parent newVal -> parent {uriPort = newVal})
 
-uriAuthLens :: Lens' URI (Maybe URIAuth)
-uriAuthLens =
+uriAuthorityLens :: Lens' URI (Maybe URIAuth)
+uriAuthorityLens =
   lens uriAuthority (\parent newVal -> parent {uriAuthority = newVal})
 
 uriSchemeLens :: Lens' URI String
