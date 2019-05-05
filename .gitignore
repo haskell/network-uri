@@ -6,3 +6,4 @@ Setup
 Setup.exe*
 TAGS
 dist/*
+dist-newstyle/*

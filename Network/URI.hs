@@ -221,7 +221,11 @@ data URIAuth = URIAuth
     { uriUserInfo   :: String           -- ^ @anonymous\@@
     , uriRegName    :: String           -- ^ @www.haskell.org@
     , uriPort       :: String           -- ^ @:42@
+#if MIN_VERSION_base(4,6,0)
+    } deriving (Eq, Ord, Show, Typeable, Data, Generic)
+#else
     } deriving (Eq, Ord, Show, Typeable, Data)
+#endif
 
 instance NFData URIAuth where
     rnf (URIAuth ui rn p) = ui `deepseq` rn `deepseq` p `deepseq` ()
