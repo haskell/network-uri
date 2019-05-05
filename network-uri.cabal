@@ -49,6 +49,7 @@ tested-with: GHC==8.2.1, GHC==8.0.2, GHC==7.10.3, GHC==7.8.4, GHC==7.6.3, GHC==7
 library
   exposed-modules:
     Network.URI
+    Network.URI.Lens
   build-depends:
     base >= 3 && < 5,
     deepseq >= 1.1 && < 1.5,
