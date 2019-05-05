@@ -11,6 +11,7 @@ module Network.URI.Lens
   , uriFragmentLens
   ) where
 
+import           Control.Applicative
 import           Network.URI
 
 type Lens' s a = Lens s s a a
