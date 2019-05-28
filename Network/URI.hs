@@ -1,4 +1,7 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE RecordWildCards, CPP #-}
+#if __GLASGOW_HASKELL__ >= 800
+{-# LANGUAGE TemplateHaskellQuotes #-}
+#endif
 --------------------------------------------------------------------------------
 -- |
 --  Module      :  Network.URI
@@ -136,6 +139,16 @@ import Data.Char (ord, chr, isHexDigit, toLower, toUpper, digitToInt)
 import Data.Bits ((.|.),(.&.),shiftL,shiftR)
 import Data.List (unfoldr, isPrefixOf, isSuffixOf)
 import Numeric (showIntAtBase)
+
+#if __GLASGOW_HASKELL__ >= 800
+#ifndef MIN_VERSION_network_uri_static
+import Language.Haskell.TH.Syntax (Lift(..))
+#else
+#if MIN_VERSION_network_uri_static(0,1,2)
+import Language.Haskell.TH.Syntax (Lift(..))
+#endif
+#endif
+#endif
 
 #if !MIN_VERSION_base(4,8,0)
 import Data.Traversable (sequenceA)
@@ -1331,6 +1344,28 @@ normalizePathSegments uristr = normstr juri
         normstr Nothing  = uristr
         normstr (Just u) = show (normuri u)
         normuri u = u { uriPath = removeDotSegments (uriPath u) }
+
+------------------------------------------------------------
+--  Lift instances to support Network.URI.Static
+------------------------------------------------------------
+
+#if __GLASGOW_HASKELL__ >= 800
+#ifndef MIN_VERSION_network_uri_static
+instance Lift URI where
+    lift (URI {..}) = [| URI {..} |]
+
+instance Lift URIAuth where
+    lift (URIAuth {..}) = [| URIAuth {..} |]
+#else
+#if MIN_VERSION_network_uri_static(0,1,2)
+instance Lift URI where
+    lift (URI {..}) = [| URI {..} |]
+
+instance Lift URIAuth where
+    lift (URIAuth {..}) = [| URIAuth {..} |]
+#endif
+#endif
+#endif
 
 ------------------------------------------------------------
 --  Deprecated functions
