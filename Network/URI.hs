@@ -412,10 +412,32 @@ isReserved :: Char -> Bool
 isReserved c = isGenDelims c || isSubDelims c
 
 isGenDelims :: Char -> Bool
-isGenDelims c = c `elem` ":/?#[]@"
+isGenDelims c =
+  case c of
+    ':' -> True
+    '/' -> True
+    '?' -> True
+    '#' -> True
+    '[' -> True
+    ']' -> True
+    '@' -> True
+    _ -> False
 
 isSubDelims :: Char -> Bool
-isSubDelims c = c `elem` "!$&'()*+,;="
+isSubDelims c =
+  case c of
+    '!' -> True
+    '$' -> True
+    '&' -> True
+    '\'' -> True
+    '(' -> True
+    ')' -> True
+    '*' -> True
+    '+' -> True
+    ',' -> True
+    ';' -> True
+    '=' -> True
+    _ -> False
 
 subDelims :: URIParser String
 subDelims = (:[]) <$> oneOf "!$&'()*+,;="
