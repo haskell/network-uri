@@ -23,6 +23,7 @@ import Network.URI
     , pathSegments
     , relativeFrom
     , relativeTo
+    , isReserved
     )
 
 import Criterion.Main
@@ -46,5 +47,10 @@ main = defaultMain [
       let Just !u1 = force (parseURIReference "../../biz/../biz/./bop") in
       let Just !u2 = force (parseURI "http://ex.it/foo/bar/baz/bap") in
       bench "dots and double dots" $ nf (relativeTo u1) u2
+    ]
+  , -- Prompted by https://github.com/haskell/network-uri/pull/46
+    bgroup "isReserved" [
+      bench "isReserved a" $ nf isReserved 'a'
+      , bench "isReserved :" $ nf isReserved ':'
     ]
   ]

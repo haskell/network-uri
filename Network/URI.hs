@@ -411,6 +411,9 @@ escaped = sequenceA [char '%', hexDigitChar, hexDigitChar]
 isReserved :: Char -> Bool
 isReserved c = isGenDelims c || isSubDelims c
 
+-- As per https://github.com/haskell/network-uri/pull/46, it was found
+-- that the explicit case statement was noticably faster than a nicer
+-- expression in terms of `elem`.
 isGenDelims :: Char -> Bool
 isGenDelims c =
   case c of
@@ -423,6 +426,9 @@ isGenDelims c =
     '@' -> True
     _ -> False
 
+-- As per https://github.com/haskell/network-uri/pull/46, it was found
+-- that the explicit case statement was noticably faster than a nicer
+-- expression in terms of `elem`.
 isSubDelims :: Char -> Bool
 isSubDelims c =
   case c of
