@@ -1,23 +1,32 @@
 #if __GLASGOW_HASKELL__ < 800
-module Network.URI.Static () where
+{-# LANGUAGE RecordWildCards, TemplateHaskell, ViewPatterns #-}
 #else
-
 {-# LANGUAGE RecordWildCards, TemplateHaskellQuotes, ViewPatterns #-}
-
+#endif
 module Network.URI.Static
     (
     -- * Absolute URIs
       uri
+#if __GLASGOW_HASKELL__ >= 708
     , staticURI
+#endif
+    , staticURI'
     -- * Relative URIs
     , relativeReference
+#if __GLASGOW_HASKELL__ >= 708
     , staticRelativeReference
+#endif
+    , staticRelativeReference'
     ) where
 
-import Language.Haskell.TH (unType)
-import Language.Haskell.TH.Lib (TExpQ)
+import Language.Haskell.TH.Lib (ExpQ)
 import Language.Haskell.TH.Quote (QuasiQuoter(..))
 import Network.URI (URI(..), parseURI, parseRelativeReference)
+
+#if __GLASGOW_HASKELL__ >= 708
+import Language.Haskell.TH.Lib (TExpQ)
+import Language.Haskell.TH.Syntax (unTypeQ)
+#endif
 
 -- $setup
 -- >>> :set -XTemplateHaskell
@@ -27,6 +36,7 @@ import Network.URI (URI(..), parseURI, parseRelativeReference)
 -- Absolute URIs
 ----------------------------------------------------------------------------
 
+#if __GLASGOW_HASKELL__ >= 708
 -- | 'staticURI' parses a specified string at compile time
 --   and return an expression representing the URI when it's a valid URI.
 --   Otherwise, it emits an error.
@@ -43,6 +53,19 @@ staticURI :: String    -- ^ String representation of a URI
           -> TExpQ URI -- ^ URI
 staticURI (parseURI -> Just u) = [|| u ||]
 staticURI s = fail $ "Invalid URI: " ++ s
+#endif
+
+-- | 'staticURI'' parses a specified string at compile time.
+--
+-- The typed template haskell 'staticURI' is available only with GHC-7.8+.
+staticURI' :: String    -- ^ String representation of a URI
+           -> ExpQ      -- ^ URI
+#if __GLASGOW_HASKELL__ >= 708
+staticURI' = unTypeQ . staticURI
+#else
+staticURI' (parseURI -> Just u) = [| u |]
+staticURI' s = fail $ "Invalid URI: " ++ s
+#endif
 
 -- | 'uri' is a quasi quoter for 'staticURI'.
 --
@@ -56,7 +79,7 @@ staticURI s = fail $ "Invalid URI: " ++ s
 -- ...
 uri :: QuasiQuoter
 uri = QuasiQuoter {
-    quoteExp = fmap unType . staticURI,
+    quoteExp =  staticURI',
     quotePat = undefined,
     quoteType = undefined,
     quoteDec = undefined
@@ -66,6 +89,7 @@ uri = QuasiQuoter {
 -- Relative URIs
 ----------------------------------------------------------------------------
 
+#if __GLASGOW_HASKELL__ >= 708
 -- | 'staticRelativeReference' parses a specified string at compile time and
 --   return an expression representing the URI when it's a valid relative
 --   reference. Otherwise, it emits an error.
@@ -82,6 +106,21 @@ staticRelativeReference :: String -- ^ String representation of a reference
                         -> TExpQ URI -- ^ Refererence
 staticRelativeReference (parseRelativeReference -> Just ref) = [|| ref ||]
 staticRelativeReference ref = fail $ "Invalid relative reference: " ++ ref
+#endif
+
+-- | 'staticRelativeReference'' parses a specified string at compile time and
+--   return an expression representing the URI when it's a valid relative
+--   reference. Otherwise, it emits an error.
+--
+-- The typed template haskell 'staticRelativeReference' is available only with GHC-7.8+.
+staticRelativeReference' :: String -- ^ String representation of a reference
+                         -> ExpQ   -- ^ Refererence
+#if __GLASGOW_HASKELL__ >= 708
+staticRelativeReference' = unTypeQ . staticRelativeReference
+#else
+staticRelativeReference' (parseRelativeReference -> Just ref) = [| ref |]
+staticRelativeReference' ref = fail $ "Invalid relative reference: " ++ ref
+#endif
 
 -- | 'relativeReference' is a quasi quoter for 'staticRelativeReference'.
 --
@@ -95,10 +134,8 @@ staticRelativeReference ref = fail $ "Invalid relative reference: " ++ ref
 -- ...
 relativeReference :: QuasiQuoter
 relativeReference = QuasiQuoter {
-    quoteExp = fmap unType . staticRelativeReference,
+    quoteExp = staticRelativeReference',
     quotePat = undefined,
     quoteType = undefined,
     quoteDec = undefined
 }
-
-#endif

@@ -1,5 +1,7 @@
 {-# LANGUAGE RecordWildCards, CPP #-}
-#if __GLASGOW_HASKELL__ >= 800
+#if __GLASGOW_HASKELL__ < 800
+{-# LANGUAGE TemplateHaskell #-}
+#else
 {-# LANGUAGE TemplateHaskellQuotes #-}
 #endif
 --------------------------------------------------------------------------------
@@ -140,15 +142,7 @@ import Data.Bits ((.|.),(.&.),shiftL,shiftR)
 import Data.List (unfoldr, isPrefixOf, isSuffixOf)
 import Numeric (showIntAtBase)
 
-#if __GLASGOW_HASKELL__ >= 800
-#ifndef MIN_VERSION_network_uri_static
 import Language.Haskell.TH.Syntax (Lift(..))
-#else
-#if MIN_VERSION_network_uri_static(0,1,2)
-import Language.Haskell.TH.Syntax (Lift(..))
-#endif
-#endif
-#endif
 
 #if !MIN_VERSION_base(4,8,0)
 import Data.Traversable (sequenceA)
@@ -161,9 +155,8 @@ import Data.Data (Data)
 import Data.Generics (Data)
 #endif
 
-#if MIN_VERSION_base(4,6,0)
+#if __GLASGOW_HASKELL__ >= 702
 import GHC.Generics (Generic)
-#else
 #endif
 
 ------------------------------------------------------------
@@ -185,7 +178,7 @@ data URI = URI
     , uriPath       :: String           -- ^ @\/ghc@
     , uriQuery      :: String           -- ^ @?query@
     , uriFragment   :: String           -- ^ @#frag@
-#if MIN_VERSION_base(4,6,0)
+#if __GLASGOW_HASKELL__ >= 702
     } deriving (Eq, Ord, Typeable, Data, Generic)
 #else
     } deriving (Eq, Ord, Typeable, Data)
@@ -234,7 +227,7 @@ data URIAuth = URIAuth
     { uriUserInfo   :: String           -- ^ @anonymous\@@
     , uriRegName    :: String           -- ^ @www.haskell.org@
     , uriPort       :: String           -- ^ @:42@
-#if MIN_VERSION_base(4,6,0)
+#if __GLASGOW_HASKELL__ >= 702
     } deriving (Eq, Ord, Show, Typeable, Data, Generic)
 #else
     } deriving (Eq, Ord, Show, Typeable, Data)
@@ -1377,23 +1370,11 @@ normalizePathSegments uristr = normstr juri
 --  Lift instances to support Network.URI.Static
 ------------------------------------------------------------
 
-#if __GLASGOW_HASKELL__ >= 800
-#ifndef MIN_VERSION_network_uri_static
 instance Lift URI where
     lift (URI {..}) = [| URI {..} |]
 
 instance Lift URIAuth where
     lift (URIAuth {..}) = [| URIAuth {..} |]
-#else
-#if MIN_VERSION_network_uri_static(0,1,2)
-instance Lift URI where
-    lift (URI {..}) = [| URI {..} |]
-
-instance Lift URIAuth where
-    lift (URIAuth {..}) = [| URIAuth {..} |]
-#endif
-#endif
-#endif
 
 ------------------------------------------------------------
 --  Deprecated functions
