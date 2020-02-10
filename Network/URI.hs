@@ -1,9 +1,15 @@
 {-# LANGUAGE RecordWildCards, CPP #-}
-#if __GLASGOW_HASKELL__ < 800
-{-# LANGUAGE TemplateHaskell #-}
+#if __GLASGOW_HASKELL__ >= 800
+{-# LANGUAGE DeriveLift, StandaloneDeriving #-}
 #else
-{-# LANGUAGE TemplateHaskellQuotes #-}
+{-# LANGUAGE TemplateHaskell #-}
 #endif
+#if MIN_VERSION_template_haskell(2,12,0) && MIN_VERSION_parsec(3,13,0)
+{-# LANGUAGE Safe #-}
+#elif __GLASGOW_HASKELL__ >= 702
+{-# LANGUAGE Trustworthy #-}
+#endif
+
 --------------------------------------------------------------------------------
 -- |
 --  Module      :  Network.URI
@@ -1370,11 +1376,16 @@ normalizePathSegments uristr = normstr juri
 --  Lift instances to support Network.URI.Static
 ------------------------------------------------------------
 
+#if __GLASGOW_HASKELL__ >= 800
+deriving instance Lift URI
+deriving instance Lift URIAuth
+#else
 instance Lift URI where
     lift (URI {..}) = [| URI {..} |]
 
 instance Lift URIAuth where
     lift (URIAuth {..}) = [| URIAuth {..} |]
+#endif
 
 ------------------------------------------------------------
 --  Deprecated functions
