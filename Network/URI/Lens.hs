@@ -1,4 +1,10 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE Rank2Types #-}
+#if __GLASGOW_HASKELL__ > 704
+{-# LANGUAGE Safe #-}
+#elif __GLASGOW_HASKELL__ > 702
+{-# LANGUAGE Trustworthy #-}
+#endif
 -- | Network uri lenses
 module Network.URI.Lens
   ( uriRegNameLens
