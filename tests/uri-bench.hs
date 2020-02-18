@@ -53,4 +53,7 @@ main = defaultMain [
       bench "isReserved a" $ nf isReserved 'a'
       , bench "isReserved :" $ nf isReserved ':'
     ]
+  ,
+    bench "parseURI" $
+      nf parseURI "http://foo@bar.quix.gov/flip/flop?a=b&c=d"
   ]
