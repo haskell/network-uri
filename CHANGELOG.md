@@ -1,6 +1,9 @@
-# network-uri-2.6.3.0 (TBD)
+# network-uri-2.6.3.0 (2020-02-18)
 * Add official support for SafeHaskell
-  NOTE: This is the first version whose SafeHaskell properties have become an intentional part of the API contract; previous versions were merely accidentally safe-inferred (or not depending on various factors; in other words, this was a fragile property).
+  NOTE: This is the first version whose SafeHaskell properties have become an
+  intentional part of the API contract; previous versions were merely
+  accidentally safe-inferred (or not depending on various factors; in other
+  words, this was a fragile property).
 * Derive `Lift` instances using `DeriveLift` extension, when available.
 
 # network-uri-2.6.2.0 (2020-01-30)
