@@ -54,12 +54,15 @@ import Network.URI
 
 import Test.HUnit
 
+import Data.Bits ((.&.), (.|.))
+import Data.Char (ord, chr)
 import Data.Maybe (fromJust)
 import Data.List (intercalate)
 import System.IO (openFile, IOMode(WriteMode), hClose)
 import qualified Test.Framework as TF
 import qualified Test.Framework.Providers.HUnit as TF
 import qualified Test.Framework.Providers.QuickCheck2 as TF
+import Test.QuickCheck ((==>), Property)
 
 -- Test supplied string for valid URI reference syntax
 --   isValidURIRef :: String -> Bool
@@ -1108,10 +1111,29 @@ testEscapeURIString06 = testEq "testEscapeURIString06"
     "hello%C3%B8%C2%A9%E6%97%A5%E6%9C%AC"
     (escapeURIString isUnescapedInURIComponent "helloø©日本")
 
-propEscapeUnEscapeLoop :: String -> Bool
-propEscapeUnEscapeLoop s = s == (unEscapeString $! escaped)
+validUnicodePoint :: Char -> Bool
+validUnicodePoint c =
+  case ord c of
+    c | c >= 0xFDD0 && c <= 0xFDEF -> False
+    c | c .&. 0xFFFE == 0xFFFE -> False
+    _ -> True
+
+propEscapeUnEscapeLoop :: String -> Property
+propEscapeUnEscapeLoop s =
+  all validUnicodePoint s ==>
+  s == (unEscapeString $! escaped)
         where
         escaped = escapeURIString (const False) s
+        {-# NOINLINE escaped #-}
+
+-- Test some Unicode chars high in the Basic Multilingual Plane.
+propEscapeUnEscapeLoopHiChars :: Char -> Property
+propEscapeUnEscapeLoopHiChars c' =
+  let c = chr $ (ord c') .|. 0xff00 in
+  validUnicodePoint c ==>
+  [c] == (unEscapeString $! escaped c)
+        where
+        escaped c = escapeURIString (const False) [c]
         {-# NOINLINE escaped #-}
 
 testEscapeURIString = TF.testGroup "testEscapeURIString"
@@ -1122,6 +1144,7 @@ testEscapeURIString = TF.testGroup "testEscapeURIString"
   , TF.testCase "testEscapeURIString05" testEscapeURIString05
   , TF.testCase "testEscapeURIString06" testEscapeURIString06
   , TF.testProperty "propEscapeUnEscapeLoop" propEscapeUnEscapeLoop
+  , TF.testProperty "propEscapeUnEscapeLoopHiChars" propEscapeUnEscapeLoopHiChars
   ]
 
 -- URI string normalization tests
