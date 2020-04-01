@@ -17,7 +17,9 @@ module Network.URI.Lens
   , uriFragmentLens
   ) where
 
+#if __GLASGOW_HASKELL__ < 710
 import           Control.Applicative
+#endif
 import           Network.URI
 
 type Lens' s a = Lens s s a a
