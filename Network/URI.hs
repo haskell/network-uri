@@ -6,6 +6,8 @@
 #endif
 #if MIN_VERSION_template_haskell(2,12,0) && MIN_VERSION_parsec(3,13,0)
 {-# LANGUAGE Safe #-}
+#elif __GLASGOW_HASKELL__ >= 808
+{-# LANGUAGE Safe #-}
 #elif __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE Trustworthy #-}
 #endif
