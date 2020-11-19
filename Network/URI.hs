@@ -125,6 +125,9 @@ module Network.URI
     , normalizeEscape
     , normalizePathSegments
 
+    -- * Raw Parsec parsers
+    , uriParser, relativeReferenceParser
+
     -- * Deprecated functions
     , parseabsoluteURI
     , escapeString
@@ -468,6 +471,11 @@ unreservedChar = (:[]) <$> satisfy isUnreserved
 --               / path-abs
 --               / path-rootless
 --               / path-empty
+
+-- | A Parsec parser for any complete URI, or what is often called an "absolute" URI,
+-- that is one that begins with a scheme like "http://".
+uriParser :: URIParser URI
+uriParser = uri  -- Note the name is for module export
 
 uri :: URIParser URI
 uri =
@@ -818,6 +826,12 @@ uriReference = uri <|> relativeRef
 --                 / path-abs
 --                 / path-noscheme
 --                 / path-empty
+
+-- | A Parsec parser for a "relative URI reference", that is a string that can
+-- be interpreted as a URI relative to some absolute base URI. A common
+-- example would be a simple path, such as "/poets/persian/rumi".
+relativeReferenceParser :: URIParser URI
+relativeReferenceParser = relativeRef  -- Note the name is for module export
 
 relativeRef :: URIParser URI
 relativeRef =
