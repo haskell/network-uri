@@ -104,7 +104,8 @@ benchmark uri-bench
     HUnit,
     network-uri,
     criterion,
-    deepseq
+    deepseq,
+    random
 
   ghc-options: -Wall -fwarn-tabs
   default-language: Haskell98
