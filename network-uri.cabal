@@ -86,9 +86,9 @@ test-suite uri
     base < 5,
     HUnit,
     network-uri,
-    test-framework,
-    test-framework-hunit,
-    test-framework-quickcheck2,
+    tasty,
+    tasty-hunit,
+    tasty-quickcheck,
     QuickCheck
 
   ghc-options: -Wall -fwarn-tabs
@@ -104,7 +104,8 @@ benchmark uri-bench
     HUnit,
     network-uri,
     criterion,
-    deepseq
+    deepseq,
+    random
 
   ghc-options: -Wall -fwarn-tabs
   default-language: Haskell98
