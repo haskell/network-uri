@@ -59,9 +59,9 @@ import Data.Char (ord, chr)
 import Data.Maybe (fromJust)
 import Data.List (intercalate)
 import System.IO (openFile, IOMode(WriteMode), hClose)
-import qualified Test.Framework as TF
-import qualified Test.Framework.Providers.HUnit as TF
-import qualified Test.Framework.Providers.QuickCheck2 as TF
+import qualified Test.Tasty as TF
+import qualified Test.Tasty.HUnit as TF
+import qualified Test.Tasty.QuickCheck as TF
 import Test.QuickCheck ((==>), Property)
 
 -- Test supplied string for valid URI reference syntax
@@ -1353,7 +1353,7 @@ testRectify = TF.testGroup "testRectify"
   ]
 
 -- Full test suite
-allTests =
+allTests = TF.testGroup "all"
   [ testURIRefSuite
   , testComponentSuite
   , testRelativeSuite
