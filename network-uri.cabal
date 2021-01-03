@@ -67,7 +67,8 @@ library
   build-depends:
     base >= 3 && < 5,
     deepseq >= 1.1 && < 1.5,
-    parsec >= 3.1.12.0 && < 3.2
+    parsec >= 3.1.12.0 && < 3.2,
+    th-compat >= 0.1 && < 1.0
   build-depends: template-haskell
   default-extensions: CPP, DeriveDataTypeable
   if impl(ghc < 7.6)
