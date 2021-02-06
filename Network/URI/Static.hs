@@ -4,7 +4,7 @@
 {-# LANGUAGE RecordWildCards, TemplateHaskellQuotes, ViewPatterns #-}
 #endif
 #if MIN_VERSION_template_haskell(2,12,0)
-{-# LANGUAGE Safe #-}
+-- {-# LANGUAGE Safe #-}
 #elif __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE Trustworthy #-}
 #endif
@@ -29,8 +29,7 @@ import Language.Haskell.TH.Quote (QuasiQuoter(..))
 import Network.URI (URI(..), parseURI, parseRelativeReference)
 
 #if __GLASGOW_HASKELL__ >= 708
-import Language.Haskell.TH.Lib (TExpQ)
-import Language.Haskell.TH.Syntax (unTypeQ)
+import Language.Haskell.TH.Syntax.Compat (SpliceQ, unTypeCode, toCode)
 #endif
 
 -- $setup
@@ -54,10 +53,10 @@ import Language.Haskell.TH.Syntax (unTypeQ)
 -- <interactive>...
 -- ... Invalid URI: http://www.google.com/##
 -- ...
-staticURI :: String    -- ^ String representation of a URI
-          -> TExpQ URI -- ^ URI
+staticURI :: String      -- ^ String representation of a URI
+          -> SpliceQ URI -- ^ URI
 staticURI (parseURI -> Just u) = [|| u ||]
-staticURI s = fail $ "Invalid URI: " ++ s
+staticURI s = error $ "Invalid URI: " ++ s
 #endif
 
 -- | 'staticURI'' parses a specified string at compile time.
@@ -66,7 +65,7 @@ staticURI s = fail $ "Invalid URI: " ++ s
 staticURI' :: String    -- ^ String representation of a URI
            -> ExpQ      -- ^ URI
 #if __GLASGOW_HASKELL__ >= 708
-staticURI' = unTypeQ . staticURI
+staticURI' = unTypeCode . toCode . staticURI
 #else
 staticURI' (parseURI -> Just u) = [| u |]
 staticURI' s = fail $ "Invalid URI: " ++ s
@@ -107,10 +106,10 @@ uri = QuasiQuoter {
 -- <interactive>...
 -- ... Invalid relative reference: http://www.google.com/
 -- ...
-staticRelativeReference :: String -- ^ String representation of a reference
-                        -> TExpQ URI -- ^ Refererence
+staticRelativeReference :: String      -- ^ String representation of a reference
+                        -> SpliceQ URI -- ^ Refererence
 staticRelativeReference (parseRelativeReference -> Just ref) = [|| ref ||]
-staticRelativeReference ref = fail $ "Invalid relative reference: " ++ ref
+staticRelativeReference ref = error $ "Invalid relative reference: " ++ ref
 #endif
 
 -- | 'staticRelativeReference'' parses a specified string at compile time and
@@ -121,7 +120,7 @@ staticRelativeReference ref = fail $ "Invalid relative reference: " ++ ref
 staticRelativeReference' :: String -- ^ String representation of a reference
                          -> ExpQ   -- ^ Refererence
 #if __GLASGOW_HASKELL__ >= 708
-staticRelativeReference' = unTypeQ . staticRelativeReference
+staticRelativeReference' = unTypeCode . toCode . staticRelativeReference
 #else
 staticRelativeReference' (parseRelativeReference -> Just ref) = [| ref |]
 staticRelativeReference' ref = fail $ "Invalid relative reference: " ++ ref
