@@ -4,7 +4,7 @@
 {-# LANGUAGE RecordWildCards, TemplateHaskellQuotes, ViewPatterns #-}
 #endif
 #if MIN_VERSION_template_haskell(2,12,0)
--- {-# LANGUAGE Safe #-}
+{-# LANGUAGE Safe #-}
 #elif __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE Trustworthy #-}
 #endif
