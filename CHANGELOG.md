@@ -1,3 +1,6 @@
+# network-uri-2.6.4.0 (2021-02-07)
+* Add compatibility with GHC 9.0.1.
+
 # network-uri-2.6.3.0 (2020-02-18)
 * Add official support for SafeHaskell
   NOTE: This is the first version whose SafeHaskell properties have become an
