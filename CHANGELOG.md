@@ -1,3 +1,6 @@
+# network-uri-2.6.4.1 (2021-02-07)
+* Fix: Restore "Safe" designation which was accidentally removed.
+
 # network-uri-2.6.4.0 (2021-02-07)
 * Add compatibility with GHC 9.0.1.
 
