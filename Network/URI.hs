@@ -4,7 +4,7 @@
 #else
 {-# LANGUAGE TemplateHaskell #-}
 #endif
-#if MIN_VERSION_template_haskell(2,12,0) && MIN_VERSION_parsec(3,13,0)
+#if MIN_VERSION_template_haskell(2,12,0) && MIN_VERSION_parsec(3,1,13)
 {-# LANGUAGE Safe #-}
 #elif __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE Trustworthy #-}
