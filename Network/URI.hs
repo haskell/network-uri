@@ -411,7 +411,7 @@ isReserved :: Char -> Bool
 isReserved c = isGenDelims c || isSubDelims c
 
 -- As per https://github.com/haskell/network-uri/pull/46, it was found
--- that the explicit case statement was noticably faster than a nicer
+-- that the explicit case statement was noticeably faster than a nicer
 -- expression in terms of `elem`.
 isGenDelims :: Char -> Bool
 isGenDelims c =
@@ -426,7 +426,7 @@ isGenDelims c =
     _ -> False
 
 -- As per https://github.com/haskell/network-uri/pull/46, it was found
--- that the explicit case statement was noticably faster than a nicer
+-- that the explicit case statement was noticeably faster than a nicer
 -- expression in terms of `elem`.
 isSubDelims :: Char -> Bool
 isSubDelims c =
