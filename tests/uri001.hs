@@ -627,7 +627,7 @@ testRelative55 = testRelative "testRelative55"
                     "http://example/x/y%2Fz" "http://example/x%2Fabc" "/x%2Fabc"
 -- Apparently, TimBL prefers the following way to 41, 42 above
 -- cf. http://lists.w3.org/Archives/Public/uri/2003Feb/0028.html
--- He also notes that there may be different relative fuctions
+-- He also notes that there may be different relative functions
 -- that satisfy the basic equivalence axiom:
 -- cf. http://lists.w3.org/Archives/Public/uri/2003Jan/0008.html
 testRelative56 = testRelative "testRelative56"
