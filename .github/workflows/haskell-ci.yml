@@ -61,12 +61,6 @@ jobs:
         with:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: latest # default, keeping for visibility
-      - name: ghcup
-        run: |
-          ghcup config set cache true
-          ghcup install ghc $GHC_VERSION
-        env:
-          GHC_VERSION: ${{ matrix.ghc }}
       - name: Set PATH and environment variables
         run: |
           echo "$HOME/.cabal/bin" >> $GITHUB_PATH
