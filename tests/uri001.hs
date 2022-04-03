@@ -234,17 +234,10 @@ testURIRef121 = testURIRef AbsId "http://[v9.123.abc;456.def]/"
 testURIRef122 = testEq "v.future authority"
                        (Just (URIAuth "" "[v9.123.abc;456.def]" ":42"))
                        ((maybe Nothing uriAuthority) . parseURI $ "http://[v9.123.abc;456.def]:42/")
--- URI with non-ASCII characters, fail with Network.HTTP escaping code (see below)
--- Currently not supported by Network.URI, but captured here for possible future reference
--- when IRI support may be added.
+-- URIs with non-ASCII characters (IRIs), are not supported by Network.URI, but
+-- captured here for possible future reference when IRI support may be added.
 testURIRef123 = testURIRef AbsId "http://example.com/test123/䡥汬漬⁗潲汤/index.html"
 testURIRef124 = testURIRef AbsId "http://example.com/test124/Москва/index.html"
-
--- From report by Alexander Ivanov:
--- should return " 䡥汬漬⁗潲汤", but returns "Hello, World" instead
--- print $ urlDecode $ urlEncode " 䡥汬漬⁗潲汤"
--- should return "Москва"
--- print $ urlDecode $ urlEncode "Москва"
 
 testURIRefSuite = TF.testGroup "Test URIrefs" testURIRefList
 testURIRefList =
@@ -1103,6 +1096,15 @@ testEscapeURIString06 = testEq "testEscapeURIString06"
     "hello%C3%B8%C2%A9%E6%97%A5%E6%9C%AC"
     (escapeURIString isUnescapedInURIComponent "helloø©日本")
 
+-- From report by Alexander Ivanov:
+-- should return " 䡥汬漬⁗潲汤", but returns "Hello, World" instead
+-- print $ urlDecode $ urlEncode " 䡥汬漬⁗潲汤"
+assertUnescapeEscapeInverse lab x = testEq lab x (unEscapeString $ escapeURIString isUnescapedInURIComponent x)
+testUnescapeEscape01 = assertUnescapeEscapeInverse "testUnescapeEscape01" " 䡥汬漬⁗潲汤"
+-- should return "Москва"
+-- print $ urlDecode $ urlEncode "Москва"
+testUnescapeEscape02 = assertUnescapeEscapeInverse "testUnescapeEscape02" "Москва"
+
 validUnicodePoint :: Char -> Bool
 validUnicodePoint c =
   case ord c of
@@ -1135,6 +1137,8 @@ testEscapeURIString = TF.testGroup "testEscapeURIString"
   , TF.testCase "testEscapeURIString04" testEscapeURIString04
   , TF.testCase "testEscapeURIString05" testEscapeURIString05
   , TF.testCase "testEscapeURIString06" testEscapeURIString06
+  , TF.testCase "testUnescapeEscape01" testUnescapeEscape01
+  , TF.testCase "testUnescapeEscape02" testUnescapeEscape02
   , TF.testProperty "propEscapeUnEscapeLoop" propEscapeUnEscapeLoop
   , TF.testProperty "propEscapeUnEscapeLoopHiChars" propEscapeUnEscapeLoopHiChars
   ]
