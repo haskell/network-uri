@@ -7,7 +7,7 @@
 #else
 {-# LANGUAGE TemplateHaskell #-}
 #endif
-#if MIN_VERSION_template_haskell(2,12,0) && MIN_VERSION_parsec(3,13,0)
+#if MIN_VERSION_template_haskell(2,12,0) && MIN_VERSION_parsec(3,1,13)
 {-# LANGUAGE Safe #-}
 #elif __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE Trustworthy #-}
@@ -415,7 +415,7 @@ isReserved :: Char -> Bool
 isReserved c = isGenDelims c || isSubDelims c
 
 -- As per https://github.com/haskell/network-uri/pull/46, it was found
--- that the explicit case statement was noticably faster than a nicer
+-- that the explicit case statement was noticeably faster than a nicer
 -- expression in terms of `elem`.
 isGenDelims :: Char -> Bool
 isGenDelims c =
@@ -430,7 +430,7 @@ isGenDelims c =
     _ -> False
 
 -- As per https://github.com/haskell/network-uri/pull/46, it was found
--- that the explicit case statement was noticably faster than a nicer
+-- that the explicit case statement was noticeably faster than a nicer
 -- expression in terms of `elem`.
 isSubDelims :: Char -> Bool
 isSubDelims c =
