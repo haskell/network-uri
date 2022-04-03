@@ -19,17 +19,9 @@
 --  To run this test without using Cabal to build the package
 --  (2013-01-05, instructions tested on MacOS):
 --  1. Install Haskell platform
---  2. cabal install test-framework
---  3. cabal install test-framework-hunit
---  4. ghc -XDeriveDataTypeable -D"MIN_VERSION_base(x,y,z)=1" ../Network/URI.hs uri001.hs
+--  2. cabal install tasty tasty-hunit tasty-quickcheck QuickCheck
+--  3. ghc -XDeriveDataTypeable -XDeriveGeneric -package QuickCheck -package tasty -package HUnit ../Network/URI.hs uri001.hs
 --  5. ./uri001
---
---  Previous build instructions:
---  Using GHC, I compile with this command line:
---  ghc --make -fglasgow-exts
---      -i..\;C:\Dev\Haskell\Lib\HUnit;C:\Dev\Haskell\Lib\Parsec
---      -o URITest.exe URITest -main-is URITest.main
---  The -i line may need changing for alternative installations.
 --
 --------------------------------------------------------------------------------
 
