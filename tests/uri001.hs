@@ -17,7 +17,7 @@
 --  This Module contains test cases for module URI.
 --
 --  To run this test without using Cabal to build the package
---  (2013-01-05, instructions tested on MacOS):
+--  (2013-01-05, instructions tested on macOS):
 --  1. Install Haskell platform
 --  2. cabal install test-framework
 --  3. cabal install test-framework-hunit
@@ -1453,7 +1453,7 @@ cu02 = ou02 `relativeTo` bu02
 -- Revision 1.4  2005/04/05 12:47:32  gklyne
 -- Added test case.
 -- Changed module name, now requires GHC -main-is to compile.
--- All tests run OK with GHC 6.4 on MS-Windows.
+-- All tests run OK with GHC 6.4 on MS Windows.
 --
 -- Revision 1.3  2004/11/05 17:29:09  gklyne
 -- Changed password-obscuring logic to reflect late change in revised URI
