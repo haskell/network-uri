@@ -19,17 +19,9 @@
 --  To run this test without using Cabal to build the package
 --  (2013-01-05, instructions tested on macOS):
 --  1. Install Haskell platform
---  2. cabal install test-framework
---  3. cabal install test-framework-hunit
---  4. ghc -XDeriveDataTypeable -D"MIN_VERSION_base(x,y,z)=1" ../Network/URI.hs uri001.hs
+--  2. cabal install tasty tasty-hunit tasty-quickcheck QuickCheck
+--  3. ghc -XDeriveDataTypeable -XDeriveGeneric -package QuickCheck -package tasty -package HUnit ../Network/URI.hs uri001.hs
 --  5. ./uri001
---
---  Previous build instructions:
---  Using GHC, I compile with this command line:
---  ghc --make -fglasgow-exts
---      -i..\;C:\Dev\Haskell\Lib\HUnit;C:\Dev\Haskell\Lib\Parsec
---      -o URITest.exe URITest -main-is URITest.main
---  The -i line may need changing for alternative installations.
 --
 --------------------------------------------------------------------------------
 
@@ -63,13 +55,6 @@ import qualified Test.Tasty as TF
 import qualified Test.Tasty.HUnit as TF
 import qualified Test.Tasty.QuickCheck as TF
 import Test.QuickCheck ((==>), Property)
-
--- Test supplied string for valid URI reference syntax
---   isValidURIRef :: String -> Bool
--- Test supplied string for valid absolute URI reference syntax
---   isAbsoluteURIRef :: String -> Bool
--- Test supplied string for valid absolute URI syntax
---   isAbsoluteURI :: String -> Bool
 
 data URIType = AbsId    -- URI form (absolute, no fragment)
              | AbsRf    -- Absolute URI reference
@@ -242,17 +227,10 @@ testURIRef121 = testURIRef AbsId "http://[v9.123.abc;456.def]/"
 testURIRef122 = testEq "v.future authority"
                        (Just (URIAuth "" "[v9.123.abc;456.def]" ":42"))
                        ((maybe Nothing uriAuthority) . parseURI $ "http://[v9.123.abc;456.def]:42/")
--- URI with non-ASCII characters, fail with Network.HTTP escaping code (see below)
--- Currently not supported by Network.URI, but captured here for possible future reference
--- when IRI support may be added.
+-- URIs with non-ASCII characters (IRIs), are not supported by Network.URI, but
+-- captured here for possible future reference when IRI support may be added.
 testURIRef123 = testURIRef AbsId "http://example.com/test123/䡥汬漬⁗潲汤/index.html"
 testURIRef124 = testURIRef AbsId "http://example.com/test124/Москва/index.html"
-
--- From report by Alexander Ivanov:
--- should return " 䡥汬漬⁗潲汤", but returns "Hello, World" instead
--- print $ urlDecode $ urlEncode " 䡥汬漬⁗潲汤"
--- should return "Москва"
--- print $ urlDecode $ urlEncode "Москва"
 
 testURIRefSuite = TF.testGroup "Test URIrefs" testURIRefList
 testURIRefList =
@@ -674,9 +652,9 @@ testRelative77 = testRelative "testRelative77"
                     "foo:bar" "http://example/a/b#c/../d"  "http://example/a/b#c/../d"
 {- These (78-81) are some awkward test cases thrown up by a question on the URI list:
      http://lists.w3.org/Archives/Public/uri/2005Jul/0013
-   Mote that RFC 3986 discards path segents after the final '/' only when merging two
-   paths - otherwise the final segment in the base URI is mnaintained.  This leads to
-   difficulty in constructinmg a reversible relativeTo/relativeFrom pair of functions.
+   Note that RFC 3986 discards path segents after the final '/' only when merging two
+   paths - otherwise the final segment in the base URI is maintained.  This leads to
+   difficulty in constructing a reversible relativeTo/relativeFrom pair of functions.
 -}
 testRelative78 = testRelative "testRelative78"
                     "http://www.example.com/data/limit/.." "http://www.example.com/data/limit/test.xml"
@@ -1111,6 +1089,15 @@ testEscapeURIString06 = testEq "testEscapeURIString06"
     "hello%C3%B8%C2%A9%E6%97%A5%E6%9C%AC"
     (escapeURIString isUnescapedInURIComponent "helloø©日本")
 
+-- From report by Alexander Ivanov:
+-- should return " 䡥汬漬⁗潲汤", but returns "Hello, World" instead
+-- print $ urlDecode $ urlEncode " 䡥汬漬⁗潲汤"
+assertUnescapeEscapeInverse lab x = testEq lab x (unEscapeString $ escapeURIString isUnescapedInURIComponent x)
+testUnescapeEscape01 = assertUnescapeEscapeInverse "testUnescapeEscape01" " 䡥汬漬⁗潲汤"
+-- should return "Москва"
+-- print $ urlDecode $ urlEncode "Москва"
+testUnescapeEscape02 = assertUnescapeEscapeInverse "testUnescapeEscape02" "Москва"
+
 validUnicodePoint :: Char -> Bool
 validUnicodePoint c =
   case ord c of
@@ -1143,6 +1130,8 @@ testEscapeURIString = TF.testGroup "testEscapeURIString"
   , TF.testCase "testEscapeURIString04" testEscapeURIString04
   , TF.testCase "testEscapeURIString05" testEscapeURIString05
   , TF.testCase "testEscapeURIString06" testEscapeURIString06
+  , TF.testCase "testUnescapeEscape01" testUnescapeEscape01
+  , TF.testCase "testUnescapeEscape02" testUnescapeEscape02
   , TF.testProperty "propEscapeUnEscapeLoop" propEscapeUnEscapeLoop
   , TF.testProperty "propEscapeUnEscapeLoopHiChars" propEscapeUnEscapeLoopHiChars
   ]
@@ -1433,94 +1422,3 @@ cu02 = ou02 `relativeTo` bu02
 --------------------------------------------------------------------------------
 -- $Source: /srv/cvs/cvs.haskell.org/fptools/libraries/network/tests/URITest.hs,v $
 -- $Author: gklyne $
--- $Revision: 1.8 $
--- $Log: URITest.hs,v $
--- Revision 1.81 2012/08/01           aaronfriel
--- Added additional test case for the "xip.io" service style URLs and absolute URLs prefixed with ipv4 addresses.
---
--- Revision 1.8  2005/07/19 22:01:27  gklyne
--- Added some additional test cases raised by discussion on URI@w3.org mailing list about 2005-07-19.  The test p[roposed by this discussion exposed a subtle bug in relativeFrom not being an exact inverse of relativeTo.
---
--- Revision 1.7  2005/06/06 16:31:44  gklyne
--- Added two new test cases.
---
--- Revision 1.6  2005/05/31 17:18:36  gklyne
--- Added some additional test cases triggered by URI-list discussions.
---
--- Revision 1.5  2005/04/07 11:09:37  gklyne
--- Added test cases for alternate parsing functions (including deprecated 'parseabsoluteURI')
---
--- Revision 1.4  2005/04/05 12:47:32  gklyne
--- Added test case.
--- Changed module name, now requires GHC -main-is to compile.
--- All tests run OK with GHC 6.4 on MS Windows.
---
--- Revision 1.3  2004/11/05 17:29:09  gklyne
--- Changed password-obscuring logic to reflect late change in revised URI
--- specification (password "anonymous" is no longer a special case).
--- Updated URI test module to use function 'escapeURIString'.
--- (Should unEscapeString be similarly updated?)
---
--- Revision 1.2  2004/10/27 13:06:55  gklyne
--- Updated URI module function names per:
--- http://www.haskell.org//pipermail/cvs-libraries/2004-October/002916.html
--- Added test cases to give better covereage of module functions.
---
--- Revision 1.1  2004/10/14 16:11:30  gklyne
--- Add URI unit test to cvs.haskell.org repository
---
--- Revision 1.17  2004/10/14 11:51:09  graham
--- Confirm that URITest runs with GHC.
--- Fix up some comments and other minor details.
---
--- Revision 1.16  2004/10/14 11:45:30  graham
--- Use moduke name main for GHC 6.2
---
--- Revision 1.15  2004/08/11 11:07:39  graham
--- Add new test case.
---
--- Revision 1.14  2004/06/30 11:35:27  graham
--- Update URI code to use hierarchical libraries for Parsec and Network.
---
--- Revision 1.13  2004/06/22 16:19:16  graham
--- New URI test case added.
---
--- Revision 1.12  2004/04/21 15:13:29  graham
--- Add test case
---
--- Revision 1.11  2004/04/21 14:54:05  graham
--- Fix up some tests
---
--- Revision 1.10  2004/04/20 14:54:13  graham
--- Fix up test cases related to port number in authority,
--- and add some more URI decomposition tests.
---
--- Revision 1.9  2004/04/07 15:06:17  graham
--- Add extra test case
--- Revise syntax in line with changes to RFC2396bis
---
--- Revision 1.8  2004/03/17 14:34:58  graham
--- Add Network.HTTP files to CVS
---
--- Revision 1.7  2004/03/16 14:19:38  graham
--- Change licence to BSD style;  add nullURI definition; new test cases.
---
--- Revision 1.6  2004/02/20 12:12:00  graham
--- Add URI normalization functions
---
--- Revision 1.5  2004/02/19 23:19:35  graham
--- Network.URI module passes all test cases
---
--- Revision 1.4  2004/02/17 20:06:02  graham
--- Revised URI parser to reflect latest RFC2396bis (-04)
---
--- Revision 1.3  2004/02/11 14:32:14  graham
--- Added work-in-progress notes.
---
--- Revision 1.2  2004/02/02 14:00:39  graham
--- Fix optional host name in URI.  Add test cases.
---
--- Revision 1.1  2004/01/27 21:13:45  graham
--- New URI module and test suite added,
--- implementing the GHC Network.URI interface.
---
