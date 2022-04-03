@@ -659,9 +659,9 @@ testRelative77 = testRelative "testRelative77"
                     "foo:bar" "http://example/a/b#c/../d"  "http://example/a/b#c/../d"
 {- These (78-81) are some awkward test cases thrown up by a question on the URI list:
      http://lists.w3.org/Archives/Public/uri/2005Jul/0013
-   Mote that RFC 3986 discards path segents after the final '/' only when merging two
-   paths - otherwise the final segment in the base URI is mnaintained.  This leads to
-   difficulty in constructinmg a reversible relativeTo/relativeFrom pair of functions.
+   Note that RFC 3986 discards path segents after the final '/' only when merging two
+   paths - otherwise the final segment in the base URI is maintained.  This leads to
+   difficulty in constructing a reversible relativeTo/relativeFrom pair of functions.
 -}
 testRelative78 = testRelative "testRelative78"
                     "http://www.example.com/data/limit/.." "http://www.example.com/data/limit/test.xml"
