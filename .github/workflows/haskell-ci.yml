@@ -58,11 +58,13 @@ jobs:
     steps:
       - name: apt
         run: |
-          apt-get update
-          apt-get install -y --no-install-recommends gnupg ca-certificates dirmngr curl git software-properties-common
-          apt-add-repository -y 'ppa:hvr/ghc'
-          apt-get update
-          apt-get install -y ghc-$GHC_VERSION cabal-install-3.2
+          ghcup config set cache true
+          ghcup install ghc $GHC_VERSION
+          # apt-get update
+          # apt-get install -y --no-install-recommends gnupg ca-certificates dirmngr curl git software-properties-common
+          # apt-add-repository -y 'ppa:hvr/ghc'
+          # apt-get update
+          # apt-get install -y ghc-$GHC_VERSION cabal-install-3.2
         env:
           GHC_VERSION: ${{ matrix.ghc }}
       - name: Set PATH and environment variables
