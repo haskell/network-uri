@@ -7,3 +7,5 @@ Setup.exe*
 TAGS
 dist/*
 dist-newstyle/*
+.vscode
+workspace.code-workspace
