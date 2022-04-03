@@ -12,7 +12,7 @@
 #
 # REGENDATA ("0.11.20210111",["github","network-uri.cabal"])
 #
-name: Haskell-CI
+name: Haskell-CI-hvr
 on:
   - push
   - pull_request
