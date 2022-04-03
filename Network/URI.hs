@@ -1,4 +1,7 @@
-{-# LANGUAGE RecordWildCards, CPP #-}
+#if __GLASGOW_HASKELL__ < 800
+{-# LANGUAGE RecordWildCards #-}
+#endif
+{-# LANGUAGE CPP #-}
 #if __GLASGOW_HASKELL__ >= 800
 {-# LANGUAGE DeriveLift, StandaloneDeriving #-}
 #else
@@ -192,11 +195,11 @@ data URI = URI
 
 -- | Add a prefix to a string, unless it already has it.
 ensurePrefix :: String -> String -> String
-ensurePrefix p s = if isPrefixOf p s then s else p ++ s
+ensurePrefix p s = if p `isPrefixOf` s then s else p ++ s
 
 -- | Add a suffix to a string, unless it already has it.
 ensureSuffix :: String -> String -> String
-ensureSuffix p s = if isSuffixOf p s then s else s ++ p
+ensureSuffix p s = if p `isSuffixOf` s then s else s ++ p
 
 -- | Given a URIAuth in "nonstandard" form (lacking required separator characters),
 -- return one that is standard.
@@ -371,17 +374,18 @@ parseAll :: URIParser a -> String -> String -> Either ParseError a
 parseAll parser filename uristr = parse newparser filename uristr
     where
         newparser =
-            do  { res <- parser
+            do  { result <- parser
                 ; eof
-                ; return res
+                ; return result
                 }
+
 
 ------------------------------------------------------------
 --  Predicates
 ------------------------------------------------------------
 
 uriIsAbsolute :: URI -> Bool
-uriIsAbsolute (URI {uriScheme = scheme'}) = scheme' /= ""
+uriIsAbsolute URI{uriScheme = scheme'} = scheme' /= ""
 
 uriIsRelative :: URI -> Bool
 uriIsRelative = not . uriIsAbsolute
@@ -486,7 +490,7 @@ uri =
             }
         }
 
-hierPart :: URIParser ((Maybe URIAuth),String)
+hierPart :: URIParser (Maybe URIAuth, String)
 hierPart =
         do  { _ <- try (string "//")
             ; ua <- uauthority
@@ -543,7 +547,7 @@ host = ipLiteral <|> try ipv4address <|> regName
 ipLiteral :: URIParser String
 ipLiteral =
     do  { _ <- char '['
-        ; ua <- ( ipv6addrz <|> ipvFuture )
+        ; ua <- ipv6addrz <|> ipvFuture
         ; _ <- char ']'
         ; return $ "[" ++ ua ++ "]"
         }
@@ -836,7 +840,7 @@ relativeRef =
             }
         }
 
-relativePart :: URIParser ((Maybe URIAuth),String)
+relativePart :: URIParser (Maybe URIAuth, String)
 relativePart =
         do  { _ <- try (string "//")
             ; ua <- uauthority
@@ -884,7 +888,7 @@ isAlphaChar :: Char -> Bool
 isAlphaChar c    = (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
 
 isDigitChar :: Char -> Bool
-isDigitChar c    = (c >= '0' && c <= '9')
+isDigitChar c    = c >= '0' && c <= '9'
 
 isAlphaNumChar :: Char -> Bool
 isAlphaNumChar c = isAlphaChar c || isDigitChar c
@@ -893,7 +897,7 @@ isHexDigitChar :: Char -> Bool
 isHexDigitChar c = isHexDigit c
 
 isSchemeChar :: Char -> Bool
-isSchemeChar c   = (isAlphaNumChar c) || (c `elem` "+-.")
+isSchemeChar c   = isAlphaNumChar c || (c `elem` "+-.")
 
 alphaChar :: URIParser Char
 alphaChar = satisfy isAlphaChar         -- or: Parsec.letter ?
@@ -948,17 +952,17 @@ uriToString userinfomap URI { uriScheme=myscheme
                             , uriQuery=myquery
                             , uriFragment=myfragment
                             } =
-    (myscheme++) . (uriAuthToString userinfomap myauthority)
+    (myscheme++) . uriAuthToString userinfomap myauthority
                . (mypath++) . (myquery++) . (myfragment++)
 
-uriAuthToString :: (String->String) -> (Maybe URIAuth) -> ShowS
+uriAuthToString :: (String->String) -> Maybe URIAuth -> ShowS
 uriAuthToString _           Nothing   = id          -- shows ""
 uriAuthToString userinfomap
         (Just URIAuth { uriUserInfo = myuinfo
                       , uriRegName  = myregname
                       , uriPort     = myport
                       } ) =
-    ("//"++) . (if null myuinfo then id else ((userinfomap myuinfo)++))
+    ("//"++) . (if null myuinfo then id else (userinfomap myuinfo ++))
              . (myregname++)
              . (myport++)
 
@@ -998,7 +1002,7 @@ escapeURIChar p c
     | otherwise = concatMap (\i -> '%' : myShowHex i "") (utf8EncodeChar c)
     where
         myShowHex :: Int -> ShowS
-        myShowHex n r =  case showIntAtBase 16 (toChrHex) n r of
+        myShowHex n r =  case showIntAtBase 16 toChrHex n r of
             []  -> "00"
             [x] -> ['0',x]
             cs  -> cs
@@ -1124,7 +1128,7 @@ relativeTo ref base
     | isDefined ( uriAuthority ref ) =
         just_segments ref { uriScheme = uriScheme base }
     | isDefined ( uriPath ref ) =
-        if (head (uriPath ref) == '/') then
+        if head (uriPath ref) == '/' then
             just_segments ref
                 { uriScheme    = uriScheme base
                 , uriAuthority = uriAuthority base
@@ -1269,8 +1273,8 @@ relPathFrom []   _    = "/"
 relPathFrom pabs []   = pabs
 relPathFrom pabs base =
     if sa1 == sb1                       -- If the first segments are equal
-        then if (sa1 == "/")              -- and they're absolute,
-            then if (sa2 == sb2)            -- then if the 2nd segs are equal,
+        then if sa1 == "/"              -- and they're absolute,
+            then if sa2 == sb2            -- then if the 2nd segs are equal,
                 then relPathFrom1 ra2 rb2   -- relativize from there.
                 else
                    pabs                     -- Otherwise it's not worth trying.
@@ -1294,7 +1298,7 @@ relPathFrom1 pabs base = relName
         relName = if null rp then
                       -- If the relative path is empty, and the basenames are
                       -- the same, then the paths must be exactly the same.
-                      if (na == nb) then ""
+                      if na == nb then ""
                       -- If the name is vulnerable to being misinterpreted,
                       -- add a dot segment in advance to protect it.
                       else if protect na then "./"++na

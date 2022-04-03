@@ -102,7 +102,7 @@ testURIRef t u = sequence_
   , testEq ("test_isAbsoluteURI:"++u)  (isAbsIdT t) (isAbsoluteURI  u)
   ]
 
-testURIRefComponents :: String -> (Maybe URI) -> String -> Assertion
+testURIRefComponents :: String -> Maybe URI -> String -> Assertion
 testURIRefComponents _lab uv us =
     testEq ("testURIRefComponents:"++us) uv (parseURIReference us)
 
@@ -241,7 +241,7 @@ testURIRef120 = testURIRef AbsId "http://192.168.0.1test.example.com/"
 testURIRef121 = testURIRef AbsId "http://[v9.123.abc;456.def]/"
 testURIRef122 = testEq "v.future authority"
                        (Just (URIAuth "" "[v9.123.abc;456.def]" ":42"))
-                       ((maybe Nothing uriAuthority) . parseURI $ "http://[v9.123.abc;456.def]:42/")
+                       (maybe Nothing uriAuthority . parseURI $ "http://[v9.123.abc;456.def]:42/")
 -- URI with non-ASCII characters, fail with Network.HTTP escaping code (see below)
 -- Currently not supported by Network.URI, but captured here for possible future reference
 -- when IRI support may be added.
@@ -396,15 +396,7 @@ testComponent01 = testURIRefComponents "testComponent01"
             } )
         "http://user:pass@example.org:99/aaa/bbb?qqq#fff"
 testComponent02 = testURIRefComponents "testComponent02"
-        ( const Nothing
-        ( Just $ URI
-            { uriScheme    = "http:"
-            , uriAuthority = Just (URIAuth "user:pass@" "example.org" ":99")
-            , uriPath      = "aaa/bbb"
-            , uriQuery     = ""
-            , uriFragment  = ""
-            } )
-        )
+        Nothing
         "http://user:pass@example.org:99aaa/bbb"
 testComponent03 = testURIRefComponents "testComponent03"
         ( Just $ URI
@@ -444,7 +436,7 @@ testComponent12 = testURIRefComponents "testComponent03"
             } )
         "file://windowsauth/d$"
 
-testComponentSuite = TF.testGroup "Test URIrefs" $
+testComponentSuite = TF.testGroup "Test URIrefs"
   [ TF.testCase "testComponent01" testComponent01
   , TF.testCase "testComponent02" testComponent02
   , TF.testCase "testComponent03" testComponent03
@@ -488,8 +480,8 @@ testRelJoin label base urel uabs =
 testRelative :: String -> String -> String -> String -> Assertion
 testRelative label base uabs urel = sequence_
     [
-    (testRelSplit (label++"(rel)") base uabs urel),
-    (testRelJoin  (label++"(abs)") base urel uabs)
+    testRelSplit (label++"(rel)") base uabs urel,
+    testRelJoin  (label++"(abs)") base urel uabs
     ]
 
 testRelative01 = testRelative "testRelative01"
@@ -1074,7 +1066,7 @@ ts04str = "http://user:...@example.org:99/aaa/bbb?ccc#ddd/eee"
 
 testShowURI01 = testEq "testShowURI01" ""      (show nullURI)
 testShowURI02 = testEq "testShowURI02" ts02str (show ts02URI)
-testShowURI03 = testEq "testShowURI03" ts03str ((uriToString id ts02URI) "")
+testShowURI03 = testEq "testShowURI03" ts03str (uriToString id ts02URI "")
 testShowURI04 = testEq "testShowURI04" ts04str (show ts04URI)
 
 testShowURI = TF.testGroup "testShowURI"
@@ -1114,8 +1106,8 @@ testEscapeURIString06 = testEq "testEscapeURIString06"
 validUnicodePoint :: Char -> Bool
 validUnicodePoint c =
   case ord c of
-    c | c >= 0xFDD0 && c <= 0xFDEF -> False
-    c | c .&. 0xFFFE == 0xFFFE -> False
+    a | a >= 0xFDD0 && a <= 0xFDEF -> False
+    a | a .&. 0xFFFE == 0xFFFE -> False
     _ -> True
 
 propEscapeUnEscapeLoop :: String -> Property
@@ -1129,7 +1121,7 @@ propEscapeUnEscapeLoop s =
 -- Test some Unicode chars high in the Basic Multilingual Plane.
 propEscapeUnEscapeLoopHiChars :: Char -> Property
 propEscapeUnEscapeLoopHiChars c' =
-  let c = chr $ (ord c') .|. 0xff00 in
+  let c = chr $ ord c' .|. 0xff00 in
   validUnicodePoint c ==>
   [c] == (unEscapeString $! escaped c)
         where
@@ -1199,17 +1191,17 @@ trbase = fromJust $ parseURIReference "http://bar.org/"
 testRelativeTo01 = testEq "testRelativeTo01"
     "http://bar.org/foo"
     (show $
-      (fromJust $ parseURIReference "foo") `relativeTo` trbase)
+      fromJust (parseURIReference "foo") `relativeTo` trbase)
 
 testRelativeTo02 = testEq "testRelativeTo02"
     "http:foo"
     (show $
-      (fromJust $ parseURIReference "http:foo") `relativeTo` trbase)
+      fromJust (parseURIReference "http:foo") `relativeTo` trbase)
 
 testRelativeTo03 = testEq "testRelativeTo03"
     "http://bar.org/foo"
     (show $
-      (fromJust $ parseURIReference "http:foo") `nonStrictRelativeTo` trbase)
+      fromJust (parseURIReference "http:foo") `nonStrictRelativeTo` trbase)
 
 testRelativeTo = TF.testGroup "testRelativeTo"
   [ TF.testCase "testRelativeTo01" testRelativeTo01
