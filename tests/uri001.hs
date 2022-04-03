@@ -56,13 +56,6 @@ import qualified Test.Tasty.HUnit as TF
 import qualified Test.Tasty.QuickCheck as TF
 import Test.QuickCheck ((==>), Property)
 
--- Test supplied string for valid URI reference syntax
---   isValidURIRef :: String -> Bool
--- Test supplied string for valid absolute URI reference syntax
---   isAbsoluteURIRef :: String -> Bool
--- Test supplied string for valid absolute URI syntax
---   isAbsoluteURI :: String -> Bool
-
 data URIType = AbsId    -- URI form (absolute, no fragment)
              | AbsRf    -- Absolute URI reference
              | RelRf    -- Relative URI reference
