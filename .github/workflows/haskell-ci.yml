@@ -63,6 +63,7 @@ jobs:
           cabal-version: latest # default, keeping for visibility
       - name: Set PATH and environment variables
         run: |
+          which ghc
           echo "$HOME/.cabal/bin" >> $GITHUB_PATH
           echo "LANG=C.UTF-8" >> $GITHUB_ENV
           echo "CABAL_DIR=$HOME/.cabal" >> $GITHUB_ENV
