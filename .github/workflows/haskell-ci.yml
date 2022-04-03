@@ -56,15 +56,15 @@ jobs:
             allow-failure: false
       fail-fast: false
     steps:
-      - name: apt
+      - uses: haskell/actions/setup@v1
+        id: setup-haskell
+        with:
+          ghc-version: ${{ matrix.ghc }}
+          cabal-version: latest # default, keeping for visibility
+      - name: ghcup
         run: |
           ghcup config set cache true
           ghcup install ghc $GHC_VERSION
-          # apt-get update
-          # apt-get install -y --no-install-recommends gnupg ca-certificates dirmngr curl git software-properties-common
-          # apt-add-repository -y 'ppa:hvr/ghc'
-          # apt-get update
-          # apt-get install -y ghc-$GHC_VERSION cabal-install-3.2
         env:
           GHC_VERSION: ${{ matrix.ghc }}
       - name: Set PATH and environment variables
