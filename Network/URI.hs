@@ -149,6 +149,7 @@ import Control.DeepSeq (NFData(rnf), deepseq)
 import Data.Char (ord, chr, isHexDigit, toLower, toUpper, digitToInt)
 import Data.Bits ((.|.),(.&.),shiftL,shiftR)
 import Data.List (unfoldr, isPrefixOf, isSuffixOf)
+import Data.Maybe (fromJust, isJust)
 import Numeric (showIntAtBase)
 
 import Language.Haskell.TH.Syntax (Lift(..))
@@ -192,6 +193,13 @@ data URI = URI
 #else
     } deriving (Eq, Ord, Typeable, Data)
 #endif
+
+instance Read URI where
+         readsPrec _ v 
+            | isJust mUri = return (fromJust mUri, "")
+            | otherwise = return (URI "" Nothing "" "" "", "")
+            where
+                mUri = parseURI v
 
 -- | Add a prefix to a string, unless it already has it.
 ensurePrefix :: String -> String -> String
