@@ -194,13 +194,6 @@ data URI = URI
     } deriving (Eq, Ord, Typeable, Data)
 #endif
 
-instance Read URI where
-         readsPrec _ v 
-            | isJust mUri = return (fromJust mUri, "")
-            | otherwise = [] 
-            where
-                mUri = parseURI v
-
 -- | Add a prefix to a string, unless it already has it.
 ensurePrefix :: String -> String -> String
 ensurePrefix p s = if p `isPrefixOf` s then s else p ++ s
@@ -238,6 +231,13 @@ unlessEmpty  f  x = f x
 instance NFData URI where
     rnf (URI s a p q f)
         = s `deepseq` a `deepseq` p `deepseq` q `deepseq` f `deepseq` ()
+
+instance Read URI where
+         readsPrec _ v 
+            | isJust mUri = return (fromJust mUri, "")
+            | otherwise = [] 
+            where
+                mUri = parseURI v
 
 -- |Type for authority value within a URI
 data URIAuth = URIAuth

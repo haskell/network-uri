@@ -1225,10 +1225,6 @@ testAltFn15 = testEq "testAltFn15" True  (isAbsoluteURI "http://a.b/c")
 testAltFn16 = testEq "testAltFn16" False (isAbsoluteURI "http://a.b/c#f")
 testAltFn17 = testEq "testAltFn17" False (isAbsoluteURI "c/d")
 
-testReadUri = testEq "testReadUri" True (isJust (readMaybe "http://a.b" :: Maybe URI))
-testReadBadUri = testEq "testReadBadUri" True (isNothing (readMaybe "baduri" :: Maybe URI))
-testReadRoundtrip = testEq "testReadRoundtrip" "http://a.b" (show (read "http://a.b" :: URI))
-
 testAltFn = TF.testGroup "testAltFn"
   [ TF.testCase "testAltFn01" testAltFn01
   , TF.testCase "testAltFn02" testAltFn02
@@ -1337,6 +1333,10 @@ testRectify = TF.testGroup "testRectify"
     "//ezra@www.google.com:80"
     ((uriAuthToString id . Just . rectifyAuth $ URIAuth "ezra" "www.google.com" "80") "")
   ]
+
+testReadUri = testEq "testReadUri" True (isJust (readMaybe "http://a.b" :: Maybe URI))
+testReadBadUri = testEq "testReadBadUri" True (isNothing (readMaybe "baduri" :: Maybe URI))
+testReadRoundtrip = testEq "testReadRoundtrip" "http://a.b" (show (read "http://a.b" :: URI))
 
 testRead = TF.testGroup "testRead" [
   TF.testCase "testReadUri" testReadUri
