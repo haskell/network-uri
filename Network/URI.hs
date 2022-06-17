@@ -197,7 +197,7 @@ data URI = URI
 instance Read URI where
          readsPrec _ v 
             | isJust mUri = return (fromJust mUri, "")
-            | otherwise = return (URI "" Nothing "" "" "", "")
+            | otherwise = [] 
             where
                 mUri = parseURI v
 
