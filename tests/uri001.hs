@@ -394,6 +394,33 @@ testComponent04 = testURIRefComponents "testComponent04"
             , uriFragment  = "#aaa/bbb"
             } )
         "http://user:pass@example.org:99#aaa/bbb"
+testComponent05 = testURIRefComponents "testComponent05"
+        ( Just $ URI
+            { uriScheme    = "news:"
+            , uriAuthority = Nothing
+            , uriPath      = "comp.infosystems.www.servers.unix"
+            , uriQuery     = ""
+            , uriFragment  = ""
+            } )
+        "news:comp.infosystems.www.servers.unix"
+testComponent06 = testURIRefComponents "testComponent06"
+        ( Just $ URI
+            { uriScheme    = "mailto:"
+            , uriAuthority = Nothing
+            , uriPath      = "John.Doe@example.com"
+            , uriQuery     = ""
+            , uriFragment  = ""
+            } )
+        "mailto:John.Doe@example.com"
+testComponent07 = testURIRefComponents "testComponent07"
+        ( Just $ URI
+            { uriScheme    = "tel:"
+            , uriAuthority = Nothing
+            , uriPath      = "+1-816-555-1212"
+            , uriQuery     = ""
+            , uriFragment  = ""
+            } )
+        "tel:+1-816-555-1212"
 -- These test cases contributed by Robert Buck (mathworks.com)
 testComponent11 = testURIRefComponents "testComponent11"
         ( Just $ URI
@@ -419,6 +446,9 @@ testComponentSuite = TF.testGroup "Test URIrefs"
   , TF.testCase "testComponent02" testComponent02
   , TF.testCase "testComponent03" testComponent03
   , TF.testCase "testComponent04" testComponent04
+  , TF.testCase "testComponent05" testComponent05
+  , TF.testCase "testComponent06" testComponent06
+  , TF.testCase "testComponent07" testComponent07
   , TF.testCase "testComponent11" testComponent11
   , TF.testCase "testComponent12" testComponent12
   ]
