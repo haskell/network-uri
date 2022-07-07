@@ -385,7 +385,7 @@ testComponent03 = testURIRefComponents "testComponent03"
             , uriFragment  = ""
             } )
         "http://user:pass@example.org:99?aaa/bbb"
-testComponent04 = testURIRefComponents "testComponent03"
+testComponent04 = testURIRefComponents "testComponent04"
         ( Just $ URI
             { uriScheme    = "http:"
             , uriAuthority = Just (URIAuth "user:pass@" "example.org" ":99")
@@ -395,7 +395,7 @@ testComponent04 = testURIRefComponents "testComponent03"
             } )
         "http://user:pass@example.org:99#aaa/bbb"
 -- These test cases contributed by Robert Buck (mathworks.com)
-testComponent11 = testURIRefComponents "testComponent03"
+testComponent11 = testURIRefComponents "testComponent11"
         ( Just $ URI
             { uriScheme    = "about:"
             , uriAuthority = Nothing
@@ -404,7 +404,7 @@ testComponent11 = testURIRefComponents "testComponent03"
             , uriFragment  = ""
             } )
         "about:"
-testComponent12 = testURIRefComponents "testComponent03"
+testComponent12 = testURIRefComponents "testComponent12"
         ( Just $ URI
             { uriScheme    = "file:"
             , uriAuthority = Just (URIAuth "" "windowsauth" "")
