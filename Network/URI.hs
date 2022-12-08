@@ -1417,9 +1417,12 @@ unreserved = isUnreserved
 scheme :: URI -> String
 scheme = orNull init . uriScheme
 
+runShowS :: ShowS -> String
+runShowS s = s ""
+
 {-# DEPRECATED authority "use uriAuthority, and note changed functionality" #-}
 authority :: URI -> String
-authority = dropss . ($"") . uriAuthToString id . uriAuthority
+authority = dropss . runShowS . uriAuthToString id . uriAuthority
     where
         -- Old-style authority component does not include leading '//'
         dropss ('/':'/':s) = s
