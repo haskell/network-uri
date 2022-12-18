@@ -1,3 +1,7 @@
+# network-uri-2.6.4.2 (2022-12-18)
+* Fix warnings, -Wtrustworthy-safe and -Woperator-whitespace-ext-conflict on GHC 9.4.
+* Slightly improved test coverage.
+
 # network-uri-2.6.4.1 (2021-02-07)
 * Fix: Restore "Safe" designation which was accidentally removed.
 
