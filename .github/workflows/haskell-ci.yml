@@ -20,7 +20,7 @@ on:
 jobs:
   linux:
     name: Haskell-CI Linux - GHC ${{ matrix.ghc }}
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     container:
       image: buildpack-deps:bionic
     continue-on-error: ${{ matrix.allow-failure }}
