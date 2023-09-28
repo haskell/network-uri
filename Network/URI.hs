@@ -149,6 +149,7 @@ import Control.DeepSeq (NFData(rnf), deepseq)
 import Data.Char (ord, chr, isHexDigit, toLower, toUpper, digitToInt)
 import Data.Bits ((.|.),(.&.),shiftL,shiftR)
 import Data.List (unfoldr, isPrefixOf, isSuffixOf)
+import Data.Maybe (fromJust, isJust)
 import Numeric (showIntAtBase)
 
 import Language.Haskell.TH.Syntax (Lift(..))
@@ -230,6 +231,17 @@ unlessEmpty  f  x = f x
 instance NFData URI where
     rnf (URI s a p q f)
         = s `deepseq` a `deepseq` p `deepseq` q `deepseq` f `deepseq` ()
+
+-- Note we should have a Read instance for older GHCs, but this version
+-- is implemented with readsPrec which is new with 7.6.0.
+#if __GLASGOW_HASKELL__ >= 760
+instance Read URI where
+         readsPrec _ v
+            | isJust mUri = return (fromJust mUri, "")
+            | otherwise = []
+            where
+                mUri = parseURI v
+#endif
 
 -- |Type for authority value within a URI
 data URIAuth = URIAuth
