@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 --------------------------------------------------------------------------------
 --  $Id: URITest.hs,v 1.8 2005/07/19 22:01:27 gklyne Exp $
@@ -48,13 +49,16 @@ import Test.HUnit
 
 import Data.Bits ((.&.), (.|.))
 import Data.Char (ord, chr)
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, isJust, isNothing)
 import Data.List (intercalate)
 import System.IO (openFile, IOMode(WriteMode), hClose)
 import qualified Test.Tasty as TF
 import qualified Test.Tasty.HUnit as TF
 import qualified Test.Tasty.QuickCheck as TF
 import Test.QuickCheck ((==>), Property)
+#if __GLASGOW_HASKELL__ >= 760
+import Text.Read (readMaybe)
+#endif
 
 data URIType = AbsId    -- URI form (absolute, no fragment)
              | AbsRf    -- Absolute URI reference
@@ -1363,6 +1367,18 @@ testRectify = TF.testGroup "testRectify"
     ((uriAuthToString id . Just . rectifyAuth $ URIAuth "ezra" "www.google.com" "80") "")
   ]
 
+#if __GLASGOW_HASKELL__ >= 760
+testReadUri = testEq "testReadUri" True (isJust (readMaybe "http://a.b" :: Maybe URI))
+testReadBadUri = testEq "testReadBadUri" True (isNothing (readMaybe "baduri" :: Maybe URI))
+testReadRoundtrip = testEq "testReadRoundtrip" "http://a.b" (show (read "http://a.b" :: URI))
+
+testRead = TF.testGroup "testRead" [
+  TF.testCase "testReadUri" testReadUri
+  , TF.testCase "testReadRoundtrip" testReadRoundtrip
+  , TF.testCase "testReadBadUri" testReadBadUri
+  ]
+#endif
+
 -- Full test suite
 allTests = TF.testGroup "all"
   [ testURIRefSuite
@@ -1380,6 +1396,9 @@ allTests = TF.testGroup "all"
   , testIsRelative
   , testPathSegments
   , testRectify
+#if __GLASGOW_HASKELL__ >= 760
+  , testRead
+#endif
   ]
 
 main = TF.defaultMain allTests
