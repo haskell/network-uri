@@ -25,8 +25,7 @@ import Network.URI
     , relativeTo
     , isReserved
     )
-
-import Criterion.Main
+import Test.Tasty.Bench
 import Control.DeepSeq
 
 main = defaultMain [

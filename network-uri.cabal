@@ -113,7 +113,7 @@ benchmark uri-bench
     base < 5,
     HUnit,
     network-uri,
-    criterion,
+    tasty-bench,
     deepseq
 
   ghc-options: -Wall -fwarn-tabs
