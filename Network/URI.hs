@@ -139,7 +139,7 @@ import Text.ParserCombinators.Parsec
     ( GenParser, ParseError
     , parse, (<?>), try
     , option, many1, count, notFollowedBy
-    , char, satisfy, oneOf, string, eof
+    , char, satisfy, string, eof
     , unexpected
     )
 
@@ -461,7 +461,7 @@ isSubDelims c =
     _ -> False
 
 subDelims :: URIParser String
-subDelims = (:[]) <$> oneOf "!$&'()*+,;="
+subDelims = (:[]) <$> satisfy isSubDelims
 
 --  RFC3986, section 2.3
 --
