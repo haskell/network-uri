@@ -8,12 +8,12 @@
 #
 # For more information, see https://github.com/haskell-CI/haskell-ci
 #
-# version: 0.11.20210111
+# version: 0.19.20240708
 #
 version: ~> 1.0
 language: c
 os: linux
-dist: xenial
+dist: jammy
 git:
   # whether to recursively clone submodules
   submodules: false
@@ -33,41 +33,41 @@ before_cache:
   - rm -rfv $CABALHOME/packages/head.hackage
 jobs:
   include:
+    - compiler: ghc-9.10.1
+      addons: {"apt":{"packages":["ghc-9.10.1","cabal-install-3.12.1.0"],"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu jammy main"}]}}
+      os: linux
+    - compiler: ghc-9.8.2
+      addons: {"apt":{"packages":["ghc-9.8.2","cabal-install-3.12.1.0"],"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu jammy main"}]}}
+      os: linux
+    - compiler: ghc-9.6.6
+      addons: {"apt":{"packages":["ghc-9.6.6","cabal-install-3.12.1.0"],"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu jammy main"}]}}
+      os: linux
+    - compiler: ghc-9.4.7
+      addons: {"apt":{"packages":["ghc-9.4.7","cabal-install-3.12.1.0"],"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu jammy main"}]}}
+      os: linux
+    - compiler: ghc-9.2.2
+      addons: {"apt":{"packages":["ghc-9.2.2","cabal-install-3.12.1.0"],"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu jammy main"}]}}
+      os: linux
+    - compiler: ghc-9.0.2
+      addons: {"apt":{"packages":["ghc-9.0.2","cabal-install-3.12.1.0"],"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu jammy main"}]}}
+      os: linux
     - compiler: ghc-8.10.1
-      addons: {"apt":{"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu xenial main"}],"packages":["ghc-8.10.1","cabal-install-3.4"]}}
+      addons: {"apt":{"packages":["ghc-8.10.1","cabal-install-3.12.1.0"],"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu jammy main"}]}}
       os: linux
     - compiler: ghc-8.8.2
-      addons: {"apt":{"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu xenial main"}],"packages":["ghc-8.8.2","cabal-install-3.4"]}}
+      addons: {"apt":{"packages":["ghc-8.8.2","cabal-install-3.12.1.0"],"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu jammy main"}]}}
       os: linux
     - compiler: ghc-8.6.5
-      addons: {"apt":{"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu xenial main"}],"packages":["ghc-8.6.5","cabal-install-3.4"]}}
+      addons: {"apt":{"packages":["ghc-8.6.5","cabal-install-3.12.1.0"],"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu jammy main"}]}}
       os: linux
     - compiler: ghc-8.4.4
-      addons: {"apt":{"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu xenial main"}],"packages":["ghc-8.4.4","cabal-install-3.4"]}}
+      addons: {"apt":{"packages":["ghc-8.4.4","cabal-install-3.12.1.0"],"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu jammy main"}]}}
       os: linux
     - compiler: ghc-8.2.2
-      addons: {"apt":{"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu xenial main"}],"packages":["ghc-8.2.2","cabal-install-3.4"]}}
+      addons: {"apt":{"packages":["ghc-8.2.2","cabal-install-3.12.1.0"],"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu jammy main"}]}}
       os: linux
     - compiler: ghc-8.0.2
-      addons: {"apt":{"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu xenial main"}],"packages":["ghc-8.0.2","cabal-install-3.4"]}}
-      os: linux
-    - compiler: ghc-7.10.3
-      addons: {"apt":{"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu xenial main"}],"packages":["ghc-7.10.3","cabal-install-3.4"]}}
-      os: linux
-    - compiler: ghc-7.8.4
-      addons: {"apt":{"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu xenial main"}],"packages":["ghc-7.8.4","cabal-install-3.4"]}}
-      os: linux
-    - compiler: ghc-7.6.3
-      addons: {"apt":{"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu xenial main"}],"packages":["ghc-7.6.3","cabal-install-3.4"]}}
-      os: linux
-    - compiler: ghc-7.4.2
-      addons: {"apt":{"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu xenial main"}],"packages":["ghc-7.4.2","cabal-install-3.4"]}}
-      os: linux
-    - compiler: ghc-7.2.2
-      addons: {"apt":{"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu xenial main"}],"packages":["ghc-7.2.2","cabal-install-3.4"]}}
-      os: linux
-    - compiler: ghc-7.0.4
-      addons: {"apt":{"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu xenial main"}],"packages":["ghc-7.0.4","cabal-install-3.4"]}}
+      addons: {"apt":{"packages":["ghc-8.0.2","cabal-install-3.12.1.0"],"sources":[{"key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286","sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu jammy main"}]}}
       os: linux
 before_install:
   - HC=$(echo "/opt/$CC/bin/ghc" | sed 's/-/\//')
@@ -119,7 +119,7 @@ install:
     echo "packages: ." >> cabal.project
   - if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo 'package network-uri' >> cabal.project ; fi
   - "if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
-  - |
+  - ""
   - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(network-uri)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
   - cat cabal.project || true
   - cat cabal.project.local || true
@@ -146,7 +146,7 @@ script:
     echo "packages: ${PKGDIR_network_uri}" >> cabal.project
   - if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo 'package network-uri' >> cabal.project ; fi
   - "if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
-  - |
+  - ""
   - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(network-uri)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
   - cat cabal.project || true
   - cat cabal.project.local || true
@@ -161,10 +161,10 @@ script:
   # cabal check...
   - (cd ${PKGDIR_network_uri} && ${CABAL} -vnormal check)
   # haddock...
-  - ${CABAL} v2-haddock $WITHCOMPILER --with-haddock $HADDOCK ${TEST} ${BENCH} all
+  - ${CABAL} v2-haddock --haddock-all $WITHCOMPILER --with-haddock $HADDOCK ${TEST} ${BENCH} all
   # Building without installed constraints for packages in global-db...
   - rm -f cabal.project.local
   - ${CABAL} v2-build $WITHCOMPILER --disable-tests --disable-benchmarks all
 
-# REGENDATA ("0.11.20210111",["network-uri.cabal"])
+# REGENDATA ("0.19.20240708",["network-uri.cabal"])
 # EOF
