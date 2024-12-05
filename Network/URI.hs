@@ -96,6 +96,7 @@ module Network.URI
     , isAbsoluteURI
     , isIPv6address
     , isIPv4address
+    , isHost
 
     -- * Predicates
     , uriIsAbsolute
@@ -366,6 +367,11 @@ isIPv6address = isValidParse ipv6address
 --
 isIPv4address :: String -> Bool
 isIPv4address = isValidParse ipv4address
+
+-- |Test if string contains a valid URI host
+--
+isHost :: String -> Bool
+isHost = isValidParse host
 
 --  Helper function for turning a string into a URI
 --
