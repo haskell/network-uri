@@ -46,7 +46,8 @@ category:            Network
 build-type:          Simple
 cabal-version:       >=1.10
 tested-with:
-  GHC ==9.10.1
+  GHC ==9.12.1
+   || ==9.10.1
    || ==9.8.2
    || ==9.6.6
    || ==9.4.7
