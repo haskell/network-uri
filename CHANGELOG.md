@@ -1,3 +1,8 @@
+# network-uri-2.6.4.3 (2025-02-19)
+* Add a Read instance for URI
+* Allow deepseq 1.5 as a dependency
+* Improve the efficiency of the segment parser
+
 # network-uri-2.6.4.2 (2022-12-18)
 * Fix warnings, -Wtrustworthy-safe and -Woperator-whitespace-ext-conflict on GHC 9.4.
 * Slightly improved test coverage.
