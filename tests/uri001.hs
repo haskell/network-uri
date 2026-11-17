@@ -231,8 +231,8 @@ testURIRefList =
   , TF.testCase "testURIRef120" $ testURIRef AbsId "http://192.168.0.1test.example.com/"
     -- URI with IPv(future) address
   , TF.testCase "testURIRef121" $ testURIRef AbsId "http://[v9.123.abc;456.def]/"
-  , TF.testCase "testURIRef122" $ testEq "v.future authority"
-      (Just (URIAuth "" "[v9.123.abc;456.def]" ":42"))
+  , TF.testCase "v.future authority" $
+      (Just (URIAuth "" "[v9.123.abc;456.def]" ":42")) @=?
       (maybe Nothing uriAuthority . parseURI $ "http://[v9.123.abc;456.def]:42/")
     -- IRI test cases not currently supported
     -- URIs with non-ASCII characters (IRIs), are not supported by Network.URI, but
@@ -874,8 +874,7 @@ testOddballList  =
 
 --  Case normalization; cf. RFC2396bis section 6.2.2.1
 --  NOTE:  authority case normalization is not performed
-testNormalize01 = testEq "testNormalize01"
-                  "http://EXAMPLE.com/Root/%2A?%2B#%2C"
+testNormalize01 = "http://EXAMPLE.com/Root/%2A?%2B#%2C" @=?
                   (normalizeCase "HTTP://EXAMPLE.com/Root/%2a?%2b#%2c")
 
 testNormalize02 :: TF.TestTree
@@ -886,41 +885,30 @@ testNormalize02 = TF.testGroup "testNormalize02"
   ]
 
 --  Encoding normalization; cf. RFC2396bis section 6.2.2.2
-testNormalize11 = testEq "testNormalize11"
-                  "HTTP://EXAMPLE.com/Root/~Me/"
-                  (normalizeEscape "HTTP://EXAMPLE.com/Root/%7eMe/")
-testNormalize12 = testEq "testNormalize12"
-                  "foo:%40AZ%5b%60az%7b%2f09%3a-._~"
-                  (normalizeEscape "foo:%40%41%5a%5b%60%61%7a%7b%2f%30%39%3a%2d%2e%5f%7e")
-testNormalize13 = testEq "testNormalize13"
-                  "foo:%3a%2f%3f%23%5b%5d%40"
-                  (normalizeEscape "foo:%3a%2f%3f%23%5b%5d%40")
+testNormalize11 = "HTTP://EXAMPLE.com/Root/~Me/" @=?
+                  normalizeEscape "HTTP://EXAMPLE.com/Root/%7eMe/"
+testNormalize12 = "foo:%40AZ%5b%60az%7b%2f09%3a-._~" @=?
+                  normalizeEscape "foo:%40%41%5a%5b%60%61%7a%7b%2f%30%39%3a%2d%2e%5f%7e"
+testNormalize13 = "foo:%3a%2f%3f%23%5b%5d%40" @=?
+                  normalizeEscape "foo:%3a%2f%3f%23%5b%5d%40"
 
 --  Path segment normalization; cf. RFC2396bis section 6.2.2.4
-testNormalize21 = testEq "testNormalize21"
-                    "http://example/c"
-                    (normalizePathSegments "http://example/a/b/../../c")
-testNormalize22 = testEq "testNormalize22"
-                    "http://example/a/"
-                    (normalizePathSegments "http://example/a/b/c/../../")
-testNormalize23 = testEq "testNormalize23"
-                    "http://example/a/b/c/"
-                    (normalizePathSegments "http://example/a/b/c/./")
-testNormalize24 = testEq "testNormalize24"
-                    "http://example/a/b/"
-                    (normalizePathSegments "http://example/a/b/c/.././")
-testNormalize25 = testEq "testNormalize25"
-                    "http://example/e"
-                    (normalizePathSegments "http://example/a/b/c/d/../../../../e")
-testNormalize26 = testEq "testNormalize26"
-                    "http://example/e"
-                    (normalizePathSegments "http://example/a/b/c/d/../.././../../e")
-testNormalize27 = testEq "testNormalize27"
-                    "http://example/e"
-                    (normalizePathSegments "http://example/a/b/../.././../../e")
-testNormalize28 = testEq "testNormalize28"
-                    "foo:e"
-                    (normalizePathSegments "foo:a/b/../.././../../e")
+testNormalize21 = "http://example/c" @=?
+                  normalizePathSegments "http://example/a/b/../../c"
+testNormalize22 = "http://example/a/" @=?
+                  normalizePathSegments "http://example/a/b/c/../../"
+testNormalize23 = "http://example/a/b/c/" @=?
+                  normalizePathSegments "http://example/a/b/c/./"
+testNormalize24 = "http://example/a/b/" @=?
+                  normalizePathSegments "http://example/a/b/c/.././"
+testNormalize25 = "http://example/e" @=?
+                  normalizePathSegments "http://example/a/b/c/d/../../../../e"
+testNormalize26 = "http://example/e" @=?
+                  normalizePathSegments "http://example/a/b/c/d/../.././../../e"
+testNormalize27 = "http://example/e" @=?
+                  normalizePathSegments "http://example/a/b/../.././../../e"
+testNormalize28 = "foo:e" @=?
+                  normalizePathSegments "foo:a/b/../.././../../e"
 
 testNormalizeSuite = TF.testGroup "testNormalizeSuite"
   [ TF.testCase "testNormalize01" testNormalize01
@@ -958,10 +946,10 @@ ts02str = "http://user:...@example.org:99/aaa/bbb?ccc#ddd/eee"
 ts03str = "http://user:pass@example.org:99/aaa/bbb?ccc#ddd/eee"
 ts04str = "http://user:...@example.org:99/aaa/bbb?ccc#ddd/eee"
 
-testShowURI01 = testEq "testShowURI01" ""      (show nullURI)
-testShowURI02 = testEq "testShowURI02" ts02str (show ts02URI)
-testShowURI03 = testEq "testShowURI03" ts03str (uriToString id ts02URI "")
-testShowURI04 = testEq "testShowURI04" ts04str (show ts04URI)
+testShowURI01 = ""      @=? show nullURI
+testShowURI02 = ts02str @=? show ts02URI
+testShowURI03 = ts03str @=? uriToString id ts02URI ""
+testShowURI04 = ts04str @=? show ts04URI
 
 testShowURI = TF.testGroup "testShowURI"
   [ TF.testCase "testShowURI01" testShowURI01
@@ -977,30 +965,30 @@ te01str = "http://example.org/az/09-_/.~:/?#[]@!$&'()*+,;="
 te02str = "http://example.org/a</b>/c%/d /e"
 te02esc = "http://example.org/a%3C/b%3E/c%25/d%20/e"
 
-testEscapeURIString01 = testEq "testEscapeURIString01"
-    te01str (escapeURIString isUnescapedInURI te01str)
+testEscapeURIString01 =
+    te01str @=? escapeURIString isUnescapedInURI te01str
 
-testEscapeURIString02 = testEq "testEscapeURIString02"
-    te02esc (escapeURIString isUnescapedInURI te02str)
+testEscapeURIString02 =
+    te02esc @=? escapeURIString isUnescapedInURI te02str
 
-testEscapeURIString03 = testEq "testEscapeURIString03"
-    te01str (unEscapeString te01str)
+testEscapeURIString03 =
+    te01str @=? unEscapeString te01str
 
-testEscapeURIString04 = testEq "testEscapeURIString04"
-    te02str (unEscapeString te02esc)
+testEscapeURIString04 =
+    te02str @=? unEscapeString te02esc
 
-testEscapeURIString05 = testEq "testEscapeURIString05"
-    "http%3A%2F%2Fexample.org%2Faz%2F09-_%2F.~%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D"
-    (escapeURIString isUnescapedInURIComponent te01str)
+testEscapeURIString05 =
+    "http%3A%2F%2Fexample.org%2Faz%2F09-_%2F.~%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D" @=?
+    escapeURIString isUnescapedInURIComponent te01str
 
-testEscapeURIString06 = testEq "testEscapeURIString06"
-    "hello%C3%B8%C2%A9%E6%97%A5%E6%9C%AC"
-    (escapeURIString isUnescapedInURIComponent "helloø©日本")
+testEscapeURIString06 =
+    "hello%C3%B8%C2%A9%E6%97%A5%E6%9C%AC" @=?
+    escapeURIString isUnescapedInURIComponent "helloø©日本"
 
 -- From report by Alexander Ivanov:
 -- should return " 䡥汬漬⁗潲汤", but returns "Hello, World" instead
 -- print $ urlDecode $ urlEncode " 䡥汬漬⁗潲汤"
-assertUnescapeEscapeInverse lab x = testEq lab x (unEscapeString $ escapeURIString isUnescapedInURIComponent x)
+assertUnescapeEscapeInverse _lab x = x @=? (unEscapeString $ escapeURIString isUnescapedInURIComponent x)
 testUnescapeEscape01 = assertUnescapeEscapeInverse "testUnescapeEscape01" " 䡥汬漬⁗潲汤"
 -- should return "Москва"
 -- print $ urlDecode $ urlEncode "Москва"
@@ -1064,20 +1052,20 @@ tn06nrm = "file://y"
 tn07str = "file:x/..//y/"
 tn07nrm = "file:/y/"
 
-testNormalizeURIString01 = testEq "testNormalizeURIString01"
-    tn01nrm (normalizeCase tn01str)
-testNormalizeURIString02 = testEq "testNormalizeURIString02"
-    tn02nrm (normalizeEscape tn02str)
-testNormalizeURIString03 = testEq "testNormalizeURIString03"
-    tn03nrm (normalizePathSegments tn03str)
-testNormalizeURIString04 = testEq "testNormalizeURIString04"
-    tn04nrm ((normalizeCase . normalizeEscape . normalizePathSegments) tn04str)
-testNormalizeURIString05 = testEq "testNormalizeURIString05"
-    tn04nrm ((normalizePathSegments . normalizeEscape . normalizeCase) tn04str)
-testNormalizeURIString06 = testEq "testNormalizeURIString06"
-    tn06nrm (normalizePathSegments tn06str)
-testNormalizeURIString07 = testEq "testNormalizeURIString07"
-    tn07nrm (normalizePathSegments tn07str)
+testNormalizeURIString01 =
+    tn01nrm @=? normalizeCase tn01str
+testNormalizeURIString02 =
+    tn02nrm @=? normalizeEscape tn02str
+testNormalizeURIString03 =
+    tn03nrm @=? normalizePathSegments tn03str
+testNormalizeURIString04 =
+    tn04nrm @=? (normalizeCase . normalizeEscape . normalizePathSegments) tn04str
+testNormalizeURIString05 =
+    tn04nrm @=? (normalizePathSegments . normalizeEscape . normalizeCase) tn04str
+testNormalizeURIString06 =
+    tn06nrm @=? normalizePathSegments tn06str
+testNormalizeURIString07 =
+    tn07nrm @=? normalizePathSegments tn07str
 
 testNormalizeURIString = TF.testGroup "testNormalizeURIString"
   [ TF.testCase "testNormalizeURIString01" testNormalizeURIString01
@@ -1093,18 +1081,18 @@ testNormalizeURIString = TF.testGroup "testNormalizeURIString"
 
 trbase = fromJust $ parseURIReference "http://bar.org/"
 
-testRelativeTo01 = testEq "testRelativeTo01"
-    "http://bar.org/foo"
+testRelativeTo01 =
+    "http://bar.org/foo" @=?
     (show $
       fromJust (parseURIReference "foo") `relativeTo` trbase)
 
-testRelativeTo02 = testEq "testRelativeTo02"
-    "http:foo"
+testRelativeTo02 =
+    "http:foo" @=?
     (show $
       fromJust (parseURIReference "http:foo") `relativeTo` trbase)
 
-testRelativeTo03 = testEq "testRelativeTo03"
-    "http://bar.org/foo"
+testRelativeTo03 =
+    "http://bar.org/foo" @=?
     (show $
       fromJust (parseURIReference "http:foo") `nonStrictRelativeTo` trbase)
 
@@ -1115,30 +1103,22 @@ testRelativeTo = TF.testGroup "testRelativeTo"
   ]
 
 -- Test alternative parsing functions
-testAltFn01 = testEq "testAltFn01" "Just http://a.b/c#f"
-    (show . parseURI $ "http://a.b/c#f")
-testAltFn02 = testEq "testAltFn02" "Just http://a.b/c#f"
-    (show . parseURIReference $ "http://a.b/c#f")
-testAltFn03 = testEq "testAltFn03" "Just c/d#f"
-    (show . parseRelativeReference $ "c/d#f")
-testAltFn04 = testEq "testAltFn04" "Nothing"
-    (show . parseRelativeReference $ "http://a.b/c#f")
-testAltFn05 = testEq "testAltFn05" "Just http://a.b/c"
-    (show . parseAbsoluteURI $ "http://a.b/c")
-testAltFn06 = testEq "testAltFn06" "Nothing"
-    (show . parseAbsoluteURI $ "http://a.b/c#f")
-testAltFn07 = testEq "testAltFn07" "Nothing"
-    (show . parseAbsoluteURI $ "c/d")
-testAltFn08 = testEq "testAltFn08" "Just http://a.b/c"
-    (show . parseAbsoluteURI $ "http://a.b/c")
+testAltFn01 = "Just http://a.b/c#f" @=? (show . parseURI $ "http://a.b/c#f")
+testAltFn02 = "Just http://a.b/c#f" @=? (show . parseURIReference $ "http://a.b/c#f")
+testAltFn03 = "Just c/d#f" @=? (show . parseRelativeReference $ "c/d#f")
+testAltFn04 = "Nothing" @=? (show . parseRelativeReference $ "http://a.b/c#f")
+testAltFn05 = "Just http://a.b/c" @=? (show . parseAbsoluteURI $ "http://a.b/c")
+testAltFn06 = "Nothing" @=? (show . parseAbsoluteURI $ "http://a.b/c#f")
+testAltFn07 = "Nothing" @=? (show . parseAbsoluteURI $ "c/d")
+testAltFn08 = "Just http://a.b/c" @=? (show . parseAbsoluteURI $ "http://a.b/c")
 
-testAltFn11 = testEq "testAltFn11" True  (isURI "http://a.b/c#f")
-testAltFn12 = testEq "testAltFn12" True  (isURIReference "http://a.b/c#f")
-testAltFn13 = testEq "testAltFn13" True  (isRelativeReference "c/d#f")
-testAltFn14 = testEq "testAltFn14" False (isRelativeReference "http://a.b/c#f")
-testAltFn15 = testEq "testAltFn15" True  (isAbsoluteURI "http://a.b/c")
-testAltFn16 = testEq "testAltFn16" False (isAbsoluteURI "http://a.b/c#f")
-testAltFn17 = testEq "testAltFn17" False (isAbsoluteURI "c/d")
+testAltFn11 = True  @=? isURI "http://a.b/c#f"
+testAltFn12 = True  @=? isURIReference "http://a.b/c#f"
+testAltFn13 = True  @=? isRelativeReference "c/d#f"
+testAltFn14 = False @=? isRelativeReference "http://a.b/c#f"
+testAltFn15 = True  @=? isAbsoluteURI "http://a.b/c"
+testAltFn16 = False @=? isAbsoluteURI "http://a.b/c#f"
+testAltFn17 = False @=? isAbsoluteURI "c/d"
 
 testAltFn = TF.testGroup "testAltFn"
   [ TF.testCase "testAltFn01" testAltFn01
@@ -1226,33 +1206,36 @@ testPathSegments = TF.testGroup "testPathSegments"
   ]
 
 testRectify = TF.testGroup "testRectify"
-  [ TF.testCase "" $ testEq "testRectify"
-    (show $ rectify $ URI { uriScheme = "http" ,
+  [ TF.testCase "testRectify"
+    ((show $ rectify $ URI { uriScheme = "http" ,
                             uriAuthority = Just (URIAuth "ezra" "www.google.com" "80") ,
                             uriPath = "/foo/bar" ,
                             uriQuery = "foo=bar&baz=quz" ,
                             uriFragment = "chap10" })
-    "http://ezra@www.google.com:80/foo/bar?foo=bar&baz=quz#chap10"
+      @?=
+    "http://ezra@www.google.com:80/foo/bar?foo=bar&baz=quz#chap10")
   , -- According to RFC2986, any URL without a // does not have an authority component.
     -- Therefore tag: URIs have all their content in the path component. This is supported
     -- by the urn: example in section 3. Note that tag: URIs have no leading slash on their
     -- path component.
-    TF.testCase "" $ testEq "testRectify"
-    "tag:timothy@hpl.hp.com,2001:web/externalHome"
+    TF.testCase "testRectify"
+    ("tag:timothy@hpl.hp.com,2001:web/externalHome"
+    @=?
     (show $ rectify $ URI { uriScheme = "tag" ,
                             uriAuthority = Nothing,
                             uriPath = "timothy@hpl.hp.com,2001:web/externalHome",
                             uriQuery = "" ,
-                            uriFragment = "" })
-  , TF.testCase "" $ testEq "testRectifyAuth"
-    "//ezra@www.google.com:80"
-    ((uriAuthToString id . Just . rectifyAuth $ URIAuth "ezra" "www.google.com" "80") "")
+                            uriFragment = "" }))
+  , TF.testCase "testRectifyAuth"
+    ("//ezra@www.google.com:80"
+    @=?
+    ((uriAuthToString id . Just . rectifyAuth $ URIAuth "ezra" "www.google.com" "80") ""))
   ]
 
 #if __GLASGOW_HASKELL__ >= 760
-testReadUri = testEq "testReadUri" True (isJust (readMaybe "http://a.b" :: Maybe URI))
-testReadBadUri = testEq "testReadBadUri" True (isNothing (readMaybe "baduri" :: Maybe URI))
-testReadRoundtrip = testEq "testReadRoundtrip" "http://a.b" (show (read "http://a.b" :: URI))
+testReadUri = True @=? (isJust (readMaybe "http://a.b" :: Maybe URI))
+testReadBadUri = True @=? (isNothing (readMaybe "baduri" :: Maybe URI))
+testReadRoundtrip = "http://a.b" @=? (show (read "http://a.b" :: URI))
 
 testRead = TF.testGroup "testRead" [
   TF.testCase "testReadUri" testReadUri
