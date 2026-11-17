@@ -91,9 +91,9 @@ testURIRef t u = sequence_
   , testEq ("test_isAbsoluteURI:"++u)  (isAbsIdT t) (isAbsoluteURI  u)
   ]
 
-testURIRefComponents :: String -> Maybe URI -> String -> Assertion
-testURIRefComponents _lab uv us =
-    testEq ("testURIRefComponents:"++us) uv (parseURIReference us)
+testURIRefComponents :: Maybe URI -> String -> Assertion
+testURIRefComponents uv us =
+    uv @?= (parseURIReference us)
 
 
 testURIRefSuite = TF.testGroup "Test URIrefs" testURIRefList
@@ -243,7 +243,7 @@ testURIRefList =
   ]
 
 -- test decomposition of URI into components
-testComponent01 = testURIRefComponents "testComponent01"
+testComponent01 = testURIRefComponents
         ( Just $ URI
             { uriScheme    = "http:"
             , uriAuthority = Just (URIAuth "user:pass@" "example.org" ":99")
@@ -252,10 +252,10 @@ testComponent01 = testURIRefComponents "testComponent01"
             , uriFragment  = "#fff"
             } )
         "http://user:pass@example.org:99/aaa/bbb?qqq#fff"
-testComponent02 = testURIRefComponents "testComponent02"
+testComponent02 = testURIRefComponents
         Nothing
         "http://user:pass@example.org:99aaa/bbb"
-testComponent03 = testURIRefComponents "testComponent03"
+testComponent03 = testURIRefComponents
         ( Just $ URI
             { uriScheme    = "http:"
             , uriAuthority = Just (URIAuth "user:pass@" "example.org" ":99")
@@ -264,7 +264,7 @@ testComponent03 = testURIRefComponents "testComponent03"
             , uriFragment  = ""
             } )
         "http://user:pass@example.org:99?aaa/bbb"
-testComponent04 = testURIRefComponents "testComponent04"
+testComponent04 = testURIRefComponents
         ( Just $ URI
             { uriScheme    = "http:"
             , uriAuthority = Just (URIAuth "user:pass@" "example.org" ":99")
@@ -273,7 +273,7 @@ testComponent04 = testURIRefComponents "testComponent04"
             , uriFragment  = "#aaa/bbb"
             } )
         "http://user:pass@example.org:99#aaa/bbb"
-testComponent05 = testURIRefComponents "testComponent05"
+testComponent05 = testURIRefComponents
         ( Just $ URI
             { uriScheme    = "news:"
             , uriAuthority = Nothing
@@ -282,7 +282,7 @@ testComponent05 = testURIRefComponents "testComponent05"
             , uriFragment  = ""
             } )
         "news:comp.infosystems.www.servers.unix"
-testComponent06 = testURIRefComponents "testComponent06"
+testComponent06 = testURIRefComponents
         ( Just $ URI
             { uriScheme    = "mailto:"
             , uriAuthority = Nothing
@@ -291,7 +291,7 @@ testComponent06 = testURIRefComponents "testComponent06"
             , uriFragment  = ""
             } )
         "mailto:John.Doe@example.com"
-testComponent07 = testURIRefComponents "testComponent07"
+testComponent07 = testURIRefComponents
         ( Just $ URI
             { uriScheme    = "tel:"
             , uriAuthority = Nothing
@@ -301,7 +301,7 @@ testComponent07 = testURIRefComponents "testComponent07"
             } )
         "tel:+1-816-555-1212"
 -- These test cases contributed by Robert Buck (mathworks.com)
-testComponent11 = testURIRefComponents "testComponent11"
+testComponent11 = testURIRefComponents
         ( Just $ URI
             { uriScheme    = "about:"
             , uriAuthority = Nothing
@@ -310,7 +310,7 @@ testComponent11 = testURIRefComponents "testComponent11"
             , uriFragment  = ""
             } )
         "about:"
-testComponent12 = testURIRefComponents "testComponent12"
+testComponent12 = testURIRefComponents
         ( Just $ URI
             { uriScheme    = "file:"
             , uriAuthority = Just (URIAuth "" "windowsauth" "")
