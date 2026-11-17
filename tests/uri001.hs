@@ -694,129 +694,74 @@ testRelativeList  =
 -- RFC2396 relative-to-absolute URI tests
 
 rfcbase  = "http://a/b/c/d;p?q"
--- normal cases, RFC2396bis 5.4.1
-testRFC01 = testRelJoin "testRFC01" rfcbase "g:h" "g:h"
-testRFC02 = testRelJoin "testRFC02" rfcbase "g" "http://a/b/c/g"
-testRFC03 = testRelJoin "testRFC03" rfcbase "./g" "http://a/b/c/g"
-testRFC04 = testRelJoin "testRFC04" rfcbase "g/" "http://a/b/c/g/"
-testRFC05 = testRelJoin "testRFC05" rfcbase "/g" "http://a/g"
-testRFC06 = testRelJoin "testRFC06" rfcbase "//g" "http://g"
-testRFC07 = testRelJoin "testRFC07" rfcbase "?y" "http://a/b/c/d;p?y"
-testRFC08 = testRelJoin "testRFC08" rfcbase "g?y" "http://a/b/c/g?y"
-testRFC09 = testRelJoin "testRFC09" rfcbase "?q#s" "http://a/b/c/d;p?q#s"
-testRFC23 = testRelJoin "testRFC10" rfcbase "#s" "http://a/b/c/d;p?q#s"
-testRFC10 = testRelJoin "testRFC11" rfcbase "g#s" "http://a/b/c/g#s"
-testRFC11 = testRelJoin "testRFC12" rfcbase "g?y#s" "http://a/b/c/g?y#s"
-testRFC12 = testRelJoin "testRFC13" rfcbase ";x" "http://a/b/c/;x"
-testRFC13 = testRelJoin "testRFC14" rfcbase "g;x" "http://a/b/c/g;x"
-testRFC14 = testRelJoin "testRFC15" rfcbase "g;x?y#s" "http://a/b/c/g;x?y#s"
-testRFC24 = testRelJoin "testRFC16" rfcbase "" "http://a/b/c/d;p?q"
-testRFC15 = testRelJoin "testRFC17" rfcbase "." "http://a/b/c/"
-testRFC16 = testRelJoin "testRFC18" rfcbase "./" "http://a/b/c/"
-testRFC17 = testRelJoin "testRFC19" rfcbase ".." "http://a/b/"
-testRFC18 = testRelJoin "testRFC20" rfcbase "../" "http://a/b/"
-testRFC19 = testRelJoin "testRFC21" rfcbase "../g" "http://a/b/g"
-testRFC20 = testRelJoin "testRFC22" rfcbase "../.." "http://a/"
-testRFC21 = testRelJoin "testRFC23" rfcbase "../../" "http://a/"
-testRFC22 = testRelJoin "testRFC24" rfcbase "../../g" "http://a/g"
--- abnormal cases, RFC2396bis 5.4.2
-testRFC31 = testRelJoin "testRFC31" rfcbase "?q" rfcbase
-testRFC32 = testRelJoin "testRFC32" rfcbase "../../../g" "http://a/g"
-testRFC33 = testRelJoin "testRFC33" rfcbase "../../../../g" "http://a/g"
-testRFC34 = testRelJoin "testRFC34" rfcbase "/./g" "http://a/g"
-testRFC35 = testRelJoin "testRFC35" rfcbase "/../g" "http://a/g"
-testRFC36 = testRelJoin "testRFC36" rfcbase "g." "http://a/b/c/g."
-testRFC37 = testRelJoin "testRFC37" rfcbase ".g" "http://a/b/c/.g"
-testRFC38 = testRelJoin "testRFC38" rfcbase "g.." "http://a/b/c/g.."
-testRFC39 = testRelJoin "testRFC39" rfcbase "..g" "http://a/b/c/..g"
-testRFC40 = testRelJoin "testRFC40" rfcbase "./../g" "http://a/b/g"
-testRFC41 = testRelJoin "testRFC41" rfcbase "./g/." "http://a/b/c/g/"
-testRFC42 = testRelJoin "testRFC42" rfcbase "g/./h" "http://a/b/c/g/h"
-testRFC43 = testRelJoin "testRFC43" rfcbase "g/../h" "http://a/b/c/h"
-testRFC44 = testRelJoin "testRFC44" rfcbase "g;x=1/./y" "http://a/b/c/g;x=1/y"
-testRFC45 = testRelJoin "testRFC45" rfcbase "g;x=1/../y" "http://a/b/c/y"
-testRFC46 = testRelJoin "testRFC46" rfcbase "g?y/./x" "http://a/b/c/g?y/./x"
-testRFC47 = testRelJoin "testRFC47" rfcbase "g?y/../x" "http://a/b/c/g?y/../x"
-testRFC48 = testRelJoin "testRFC48" rfcbase "g#s/./x" "http://a/b/c/g#s/./x"
-testRFC49 = testRelJoin "testRFC49" rfcbase "g#s/../x" "http://a/b/c/g#s/../x"
-testRFC50 = testRelJoin "testRFC50" rfcbase "http:x" "http:x"
-
--- Null path tests
--- See RFC2396bis, section 5.2,
--- "If the base URI's path component is the empty string, then a single
---  slash character is copied to the buffer"
-testRFC60 = testRelative "testRFC60" "http://ex"     "http://ex/x/y?q" "/x/y?q"
-testRFC61 = testRelJoin  "testRFC61" "http://ex"     "x/y?q"           "http://ex/x/y?q"
-testRFC62 = testRelative "testRFC62" "http://ex?p"   "http://ex/x/y?q" "/x/y?q"
-testRFC63 = testRelJoin  "testRFC63" "http://ex?p"   "x/y?q"           "http://ex/x/y?q"
-testRFC64 = testRelative "testRFC64" "http://ex#f"   "http://ex/x/y?q" "/x/y?q"
-testRFC65 = testRelJoin  "testRFC65" "http://ex#f"   "x/y?q"           "http://ex/x/y?q"
-testRFC66 = testRelative "testRFC66" "http://ex?p"   "http://ex/x/y#g" "/x/y#g"
-testRFC67 = testRelJoin  "testRFC67" "http://ex?p"   "x/y#g"           "http://ex/x/y#g"
-testRFC68 = testRelative "testRFC68" "http://ex"     "http://ex/"      "/"
-testRFC69 = testRelJoin  "testRFC69" "http://ex"     "./"              "http://ex/"
-testRFC70 = testRelative "testRFC70" "http://ex"     "http://ex/a/b"   "/a/b"
 testRFC71 = testRelative "testRFC71" "http://ex/a/b" "http://ex"       "./"
 
 testRFC2396Suite = TF.testGroup "Test RFC2396 examples" testRFC2396List
 testRFC2396List  =
-  [ TF.testCase "testRFC01" testRFC01
-  , TF.testCase "testRFC02" testRFC02
-  , TF.testCase "testRFC03" testRFC03
-  , TF.testCase "testRFC04" testRFC04
-  , TF.testCase "testRFC05" testRFC05
-  , TF.testCase "testRFC06" testRFC06
-  , TF.testCase "testRFC07" testRFC07
-  , TF.testCase "testRFC08" testRFC08
-  , TF.testCase "testRFC09" testRFC09
-  , TF.testCase "testRFC10" testRFC10
-  , TF.testCase "testRFC11" testRFC11
-  , TF.testCase "testRFC12" testRFC12
-  , TF.testCase "testRFC13" testRFC13
-  , TF.testCase "testRFC14" testRFC14
-  , TF.testCase "testRFC15" testRFC15
-  , TF.testCase "testRFC16" testRFC16
-  , TF.testCase "testRFC17" testRFC17
-  , TF.testCase "testRFC18" testRFC18
-  , TF.testCase "testRFC19" testRFC19
-  , TF.testCase "testRFC20" testRFC20
-  , TF.testCase "testRFC21" testRFC21
-  , TF.testCase "testRFC22" testRFC22
-  , TF.testCase "testRFC23" testRFC23
-  , TF.testCase "testRFC24" testRFC24
+    -- normal cases, RFC2396bis 5.4.1
+  [ TF.testCase "testRFC01" $ testRelJoin "testRFC01" rfcbase "g:h" "g:h"
+  , TF.testCase "testRFC02" $ testRelJoin "testRFC02" rfcbase "g" "http://a/b/c/g"
+  , TF.testCase "testRFC03" $ testRelJoin "testRFC03" rfcbase "./g" "http://a/b/c/g"
+  , TF.testCase "testRFC04" $ testRelJoin "testRFC04" rfcbase "g/" "http://a/b/c/g/"
+  , TF.testCase "testRFC05" $ testRelJoin "testRFC05" rfcbase "/g" "http://a/g"
+  , TF.testCase "testRFC06" $ testRelJoin "testRFC06" rfcbase "//g" "http://g"
+  , TF.testCase "testRFC07" $ testRelJoin "testRFC07" rfcbase "?y" "http://a/b/c/d;p?y"
+  , TF.testCase "testRFC08" $ testRelJoin "testRFC08" rfcbase "g?y" "http://a/b/c/g?y"
+  , TF.testCase "testRFC09" $ testRelJoin "testRFC09" rfcbase "?q#s" "http://a/b/c/d;p?q#s"
+  , TF.testCase "testRFC10" $ testRelJoin "testRFC11" rfcbase "g#s" "http://a/b/c/g#s"
+  , TF.testCase "testRFC11" $ testRelJoin "testRFC12" rfcbase "g?y#s" "http://a/b/c/g?y#s"
+  , TF.testCase "testRFC12" $ testRelJoin "testRFC13" rfcbase ";x" "http://a/b/c/;x"
+  , TF.testCase "testRFC13" $ testRelJoin "testRFC14" rfcbase "g;x" "http://a/b/c/g;x"
+  , TF.testCase "testRFC14" $ testRelJoin "testRFC15" rfcbase "g;x?y#s" "http://a/b/c/g;x?y#s"
+  , TF.testCase "testRFC15" $ testRelJoin "testRFC17" rfcbase "." "http://a/b/c/"
+  , TF.testCase "testRFC16" $ testRelJoin "testRFC18" rfcbase "./" "http://a/b/c/"
+  , TF.testCase "testRFC17" $ testRelJoin "testRFC19" rfcbase ".." "http://a/b/"
+  , TF.testCase "testRFC18" $ testRelJoin "testRFC20" rfcbase "../" "http://a/b/"
+  , TF.testCase "testRFC19" $ testRelJoin "testRFC21" rfcbase "../g" "http://a/b/g"
+  , TF.testCase "testRFC20" $ testRelJoin "testRFC22" rfcbase "../.." "http://a/"
+  , TF.testCase "testRFC21" $ testRelJoin "testRFC23" rfcbase "../../" "http://a/"
+  , TF.testCase "testRFC22" $ testRelJoin "testRFC24" rfcbase "../../g" "http://a/g"
+  , TF.testCase "testRFC23" $ testRelJoin "testRFC10" rfcbase "#s" "http://a/b/c/d;p?q#s"
+  , TF.testCase "testRFC24" $ testRelJoin "testRFC16" rfcbase "" "http://a/b/c/d;p?q"
     -- testRFC30,
-  , TF.testCase "testRFC31" testRFC31
-  , TF.testCase "testRFC32" testRFC32
-  , TF.testCase "testRFC33" testRFC33
-  , TF.testCase "testRFC34" testRFC34
-  , TF.testCase "testRFC35" testRFC35
-  , TF.testCase "testRFC36" testRFC36
-  , TF.testCase "testRFC37" testRFC37
-  , TF.testCase "testRFC38" testRFC38
-  , TF.testCase "testRFC39" testRFC39
-  , TF.testCase "testRFC40" testRFC40
-  , TF.testCase "testRFC41" testRFC41
-  , TF.testCase "testRFC42" testRFC42
-  , TF.testCase "testRFC43" testRFC43
-  , TF.testCase "testRFC44" testRFC44
-  , TF.testCase "testRFC45" testRFC45
-  , TF.testCase "testRFC46" testRFC46
-  , TF.testCase "testRFC47" testRFC47
-  , TF.testCase "testRFC48" testRFC48
-  , TF.testCase "testRFC49" testRFC49
-  , TF.testCase "testRFC50" testRFC50
+    -- abnormal cases, RFC2396bis 5.4.2
+  , TF.testCase "testRFC31" $ testRelJoin "testRFC31" rfcbase "?q" rfcbase
+  , TF.testCase "testRFC32" $ testRelJoin "testRFC32" rfcbase "../../../g" "http://a/g"
+  , TF.testCase "testRFC33" $ testRelJoin "testRFC33" rfcbase "../../../../g" "http://a/g"
+  , TF.testCase "testRFC34" $ testRelJoin "testRFC34" rfcbase "/./g" "http://a/g"
+  , TF.testCase "testRFC35" $ testRelJoin "testRFC35" rfcbase "/../g" "http://a/g"
+  , TF.testCase "testRFC36" $ testRelJoin "testRFC36" rfcbase "g." "http://a/b/c/g."
+  , TF.testCase "testRFC37" $ testRelJoin "testRFC37" rfcbase ".g" "http://a/b/c/.g"
+  , TF.testCase "testRFC38" $ testRelJoin "testRFC38" rfcbase "g.." "http://a/b/c/g.."
+  , TF.testCase "testRFC39" $ testRelJoin "testRFC39" rfcbase "..g" "http://a/b/c/..g"
+  , TF.testCase "testRFC40" $ testRelJoin "testRFC40" rfcbase "./../g" "http://a/b/g"
+  , TF.testCase "testRFC41" $ testRelJoin "testRFC41" rfcbase "./g/." "http://a/b/c/g/"
+  , TF.testCase "testRFC42" $ testRelJoin "testRFC42" rfcbase "g/./h" "http://a/b/c/g/h"
+  , TF.testCase "testRFC43" $ testRelJoin "testRFC43" rfcbase "g/../h" "http://a/b/c/h"
+  , TF.testCase "testRFC44" $ testRelJoin "testRFC44" rfcbase "g;x=1/./y" "http://a/b/c/g;x=1/y"
+  , TF.testCase "testRFC45" $ testRelJoin "testRFC45" rfcbase "g;x=1/../y" "http://a/b/c/y"
+  , TF.testCase "testRFC46" $ testRelJoin "testRFC46" rfcbase "g?y/./x" "http://a/b/c/g?y/./x"
+  , TF.testCase "testRFC47" $ testRelJoin "testRFC47" rfcbase "g?y/../x" "http://a/b/c/g?y/../x"
+  , TF.testCase "testRFC48" $ testRelJoin "testRFC48" rfcbase "g#s/./x" "http://a/b/c/g#s/./x"
+  , TF.testCase "testRFC49" $ testRelJoin "testRFC49" rfcbase "g#s/../x" "http://a/b/c/g#s/../x"
+  , TF.testCase "testRFC50" $ testRelJoin "testRFC50" rfcbase "http:x" "http:x"
     --
-  , TF.testCase "testRFC60" testRFC60
-  , TF.testCase "testRFC61" testRFC61
-  , TF.testCase "testRFC62" testRFC62
-  , TF.testCase "testRFC63" testRFC63
-  , TF.testCase "testRFC64" testRFC64
-  , TF.testCase "testRFC65" testRFC65
-  , TF.testCase "testRFC66" testRFC66
-  , TF.testCase "testRFC67" testRFC67
-  , TF.testCase "testRFC68" testRFC68
-  , TF.testCase "testRFC69" testRFC69
-  , TF.testCase "testRFC70" testRFC70
+    -- Null path tests
+    -- See RFC2396bis, section 5.2,
+    -- "If the base URI's path component is the empty string, then a single
+    --  slash character is copied to the buffer"
+  , TF.testCase "testRFC60" $ testRelative "testRFC60" "http://ex"     "http://ex/x/y?q" "/x/y?q"
+  , TF.testCase "testRFC61" $ testRelJoin  "testRFC61" "http://ex"     "x/y?q"           "http://ex/x/y?q"
+  , TF.testCase "testRFC62" $ testRelative "testRFC62" "http://ex?p"   "http://ex/x/y?q" "/x/y?q"
+  , TF.testCase "testRFC63" $ testRelJoin  "testRFC63" "http://ex?p"   "x/y?q"           "http://ex/x/y?q"
+  , TF.testCase "testRFC64" $ testRelative "testRFC64" "http://ex#f"   "http://ex/x/y?q" "/x/y?q"
+  , TF.testCase "testRFC65" $ testRelJoin  "testRFC65" "http://ex#f"   "x/y?q"           "http://ex/x/y?q"
+  , TF.testCase "testRFC66" $ testRelative "testRFC66" "http://ex?p"   "http://ex/x/y#g" "/x/y#g"
+  , TF.testCase "testRFC67" $ testRelJoin  "testRFC67" "http://ex?p"   "x/y#g"           "http://ex/x/y#g"
+  , TF.testCase "testRFC68" $ testRelative "testRFC68" "http://ex"     "http://ex/"      "/"
+  , TF.testCase "testRFC69" $ testRelJoin  "testRFC69" "http://ex"     "./"              "http://ex/"
+  , TF.testCase "testRFC70" $ testRelative "testRFC70" "http://ex"     "http://ex/a/b"   "/a/b"
+  , TF.testCase "testRFC71" $ testRelative "testRFC71" "http://ex/a/b" "http://ex"       "./"
   ]
 
 -- And some other oddballs:
