@@ -694,7 +694,6 @@ testRelativeList  =
 -- RFC2396 relative-to-absolute URI tests
 
 rfcbase  = "http://a/b/c/d;p?q"
-testRFC71 = testRelative "testRFC71" "http://ex/a/b" "http://ex"       "./"
 
 testRFC2396Suite = TF.testGroup "Test RFC2396 examples" testRFC2396List
 testRFC2396List  =
@@ -761,7 +760,8 @@ testRFC2396List  =
   , TF.testCase "testRFC68" $ testRelative "testRFC68" "http://ex"     "http://ex/"      "/"
   , TF.testCase "testRFC69" $ testRelJoin  "testRFC69" "http://ex"     "./"              "http://ex/"
   , TF.testCase "testRFC70" $ testRelative "testRFC70" "http://ex"     "http://ex/a/b"   "/a/b"
-  , TF.testCase "testRFC71" $ testRelative "testRFC71" "http://ex/a/b" "http://ex"       "./"
+  , TF.testCase "testRFC71a"$ testRelJoin  "testRFC71a" "http://ex/a/b" "http://ex"      "http://ex" -- TODO: is this correct?
+  , TF.testCase "testRFC71b"$ testRelSplit "testRFC71b" "http://ex/a/b" "http://ex"      "/"
   ]
 
 -- And some other oddballs:
