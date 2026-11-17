@@ -1390,11 +1390,11 @@ normalizeEscape []             = []
 -- |Path segment normalization; cf. RFC3986 section 6.2.2.3
 --
 normalizePathSegments :: String -> String
-normalizePathSegments uristr = normstr (parseURI uristr)
+normalizePathSegments uristr =
+    case parseURI uristr of
+        Nothing  -> uristr
+        (Just u) -> uriToString preservingUserInfoMap (normuri u) ""
     where
-        normstr :: Maybe URI -> String
-        normstr Nothing  = uristr
-        normstr (Just u) = uriToString preservingUserInfoMap (normuri u) ""
         normuri u = u { uriPath = removeDotSegments (uriPath u) }
 
 ------------------------------------------------------------
