@@ -129,6 +129,12 @@ testURIRef027 = testURIRef AbsId "http://[2010:836B:4179::836B:4179]"
 testURIRef028 = testURIRef RelRf "//[2010:836B:4179::836B:4179]"
 testURIRef029 = testURIRef InvRf "[2010:836B:4179::836B:4179]"
 testURIRef030 = testURIRef AbsId "http://[fe80::ff:fe00:1%25eth0]"
+-- IPvFuture literals:
+testIPVFuture1 = testURIRef AbsId "http://[v1.a]/"
+testIPVFuture2 = testURIRef AbsId "http://[v1.a:b]/"
+testIPVFuture3 = testURIRef AbsId "http://[v1F.a]/"
+testIPVFuture4 = testURIRef AbsId "http://[V1.a]/"
+
 -- RFC2396 test cases
 testURIRef031 = testURIRef RelRf "./aaa"
 testURIRef032 = testURIRef RelRf "../aaa"
@@ -270,6 +276,11 @@ testURIRefList =
   , TF.testCase "testURIRef028" testURIRef028
   , TF.testCase "testURIRef029" testURIRef029
   , TF.testCase "testURIRef030" testURIRef030
+    --
+  , TF.testCase "testIPVFuture1" testIPVFuture1
+  , TF.testCase "testIPVFuture2" testIPVFuture2
+  , TF.testCase "testIPVFuture3" testIPVFuture3
+  , TF.testCase "testIPVFuture4" testIPVFuture4
     --
   , TF.testCase "testURIRef031" testURIRef031
   , TF.testCase "testURIRef032" testURIRef032
