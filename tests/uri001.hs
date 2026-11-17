@@ -269,6 +269,7 @@ testURIRefList =
   , TF.testCase "testURIRef027" testURIRef027
   , TF.testCase "testURIRef028" testURIRef028
   , TF.testCase "testURIRef029" testURIRef029
+  , TF.testCase "testURIRef030" testURIRef030
     --
   , TF.testCase "testURIRef031" testURIRef031
   , TF.testCase "testURIRef032" testURIRef032
