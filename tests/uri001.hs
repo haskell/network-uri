@@ -96,275 +96,150 @@ testURIRefComponents _lab uv us =
     testEq ("testURIRefComponents:"++us) uv (parseURIReference us)
 
 
-testURIRef001 = testURIRef AbsRf "http://example.org/aaa/bbb#ccc"
-testURIRef002 = testURIRef AbsId "mailto:local@domain.org"
-testURIRef003 = testURIRef AbsRf "mailto:local@domain.org#frag"
-testURIRef004 = testURIRef AbsRf "HTTP://EXAMPLE.ORG/AAA/BBB#CCC"
-testURIRef005 = testURIRef RelRf "//example.org/aaa/bbb#ccc"
-testURIRef006 = testURIRef RelRf "/aaa/bbb#ccc"
-testURIRef007 = testURIRef RelRf "bbb#ccc"
-testURIRef008 = testURIRef RelRf "#ccc"
-testURIRef009 = testURIRef RelRf "#"
-testURIRef010 = testURIRef RelRf "/"
--- escapes
-testURIRef011 = testURIRef AbsRf "http://example.org/aaa%2fbbb#ccc"
-testURIRef012 = testURIRef AbsRf "http://example.org/aaa%2Fbbb#ccc"
-testURIRef013 = testURIRef RelRf "%2F"
-testURIRef014 = testURIRef RelRf "aaa%2Fbbb"
--- ports
-testURIRef015 = testURIRef AbsRf "http://example.org:80/aaa/bbb#ccc"
-testURIRef016 = testURIRef AbsRf "http://example.org:/aaa/bbb#ccc"
-testURIRef017 = testURIRef AbsRf "http://example.org./aaa/bbb#ccc"
-testURIRef018 = testURIRef AbsRf "http://example.123./aaa/bbb#ccc"
--- bare authority
-testURIRef019 = testURIRef AbsId "http://example.org"
--- IPv6 literals (from RFC2732):
-testURIRef021 = testURIRef AbsId "http://[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:80/index.html"
-testURIRef022 = testURIRef AbsId "http://[1080:0:0:0:8:800:200C:417A]/index.html"
-testURIRef023 = testURIRef AbsId "http://[3ffe:2a00:100:7031::1]"
-testURIRef024 = testURIRef AbsId "http://[1080::8:800:200C:417A]/foo"
-testURIRef025 = testURIRef AbsId "http://[::192.9.5.5]/ipng"
-testURIRef026 = testURIRef AbsId "http://[::FFFF:129.144.52.38]:80/index.html"
-testURIRef027 = testURIRef AbsId "http://[2010:836B:4179::836B:4179]"
-testURIRef028 = testURIRef RelRf "//[2010:836B:4179::836B:4179]"
-testURIRef029 = testURIRef InvRf "[2010:836B:4179::836B:4179]"
-testURIRef030 = testURIRef AbsId "http://[fe80::ff:fe00:1%25eth0]"
--- RFC2396 test cases
-testURIRef031 = testURIRef RelRf "./aaa"
-testURIRef032 = testURIRef RelRf "../aaa"
-testURIRef033 = testURIRef AbsId "g:h"
-testURIRef034 = testURIRef RelRf "g"
-testURIRef035 = testURIRef RelRf "./g"
-testURIRef036 = testURIRef RelRf "g/"
-testURIRef037 = testURIRef RelRf "/g"
-testURIRef038 = testURIRef RelRf "//g"
-testURIRef039 = testURIRef RelRf "?y"
-testURIRef040 = testURIRef RelRf "g?y"
-testURIRef041 = testURIRef RelRf "#s"
-testURIRef042 = testURIRef RelRf "g#s"
-testURIRef043 = testURIRef RelRf "g?y#s"
-testURIRef044 = testURIRef RelRf ";x"
-testURIRef045 = testURIRef RelRf "g;x"
-testURIRef046 = testURIRef RelRf "g;x?y#s"
-testURIRef047 = testURIRef RelRf "."
-testURIRef048 = testURIRef RelRf "./"
-testURIRef049 = testURIRef RelRf ".."
-testURIRef050 = testURIRef RelRf "../"
-testURIRef051 = testURIRef RelRf "../g"
-testURIRef052 = testURIRef RelRf "../.."
-testURIRef053 = testURIRef RelRf "../../"
-testURIRef054 = testURIRef RelRf "../../g"
-testURIRef055 = testURIRef RelRf "../../../g"
-testURIRef056 = testURIRef RelRf "../../../../g"
-testURIRef057 = testURIRef RelRf "/./g"
-testURIRef058 = testURIRef RelRf "/../g"
-testURIRef059 = testURIRef RelRf "g."
-testURIRef060 = testURIRef RelRf ".g"
-testURIRef061 = testURIRef RelRf "g.."
-testURIRef062 = testURIRef RelRf "..g"
-testURIRef063 = testURIRef RelRf "./../g"
-testURIRef064 = testURIRef RelRf "./g/."
-testURIRef065 = testURIRef RelRf "g/./h"
-testURIRef066 = testURIRef RelRf "g/../h"
-testURIRef067 = testURIRef RelRf "g;x=1/./y"
-testURIRef068 = testURIRef RelRf "g;x=1/../y"
-testURIRef069 = testURIRef RelRf "g?y/./x"
-testURIRef070 = testURIRef RelRf "g?y/../x"
-testURIRef071 = testURIRef RelRf "g#s/./x"
-testURIRef072 = testURIRef RelRf "g#s/../x"
-testURIRef073 = testURIRef RelRf ""
-testURIRef074 = testURIRef RelRf "A'C"
-testURIRef075 = testURIRef RelRf "A$C"
-testURIRef076 = testURIRef RelRf "A@C"
-testURIRef077 = testURIRef RelRf "A,C"
--- Invalid
-testURIRef080 = testURIRef InvRf "http://foo.org:80Path/More"
-testURIRef081 = testURIRef InvRf "::"
-testURIRef082 = testURIRef InvRf " "
-testURIRef083 = testURIRef InvRf "%"
-testURIRef084 = testURIRef InvRf "A%Z"
-testURIRef085 = testURIRef InvRf "%ZZ"
-testURIRef086 = testURIRef InvRf "%AZ"
-testURIRef087 = testURIRef InvRf "A C"
--- testURIRef088 = -- (case removed)
--- testURIRef089 = -- (case removed)
-testURIRef090 = testURIRef InvRf "A\"C"
-testURIRef091 = testURIRef InvRf "A`C"
-testURIRef092 = testURIRef InvRf "A<C"
-testURIRef093 = testURIRef InvRf "A>C"
-testURIRef094 = testURIRef InvRf "A^C"
-testURIRef095 = testURIRef InvRf "A\\C"
-testURIRef096 = testURIRef InvRf "A{C"
-testURIRef097 = testURIRef InvRf "A|C"
-testURIRef098 = testURIRef InvRf "A}C"
--- From RFC2396:
--- rel_segment   = 1*( unreserved | escaped |
---                     ";" | "@" | "&" | "=" | "+" | "$" | "," )
--- unreserved    = alphanum | mark
--- mark          = "-" | "_" | "." | "!" | "~" | "*" | "'" |
---                 "(" | ")"
--- Note RFC 2732 allows '[', ']' ONLY for reserved purpose of IPv6 literals,
--- or does it?
-testURIRef101 = testURIRef InvRf "A[C"
-testURIRef102 = testURIRef InvRf "A]C"
-testURIRef103 = testURIRef InvRf "A[**]C"
-testURIRef104 = testURIRef InvRf "http://[xyz]/"
-testURIRef105 = testURIRef InvRf "http://]/"
-testURIRef106 = testURIRef InvRf "http://example.org/[2010:836B:4179::836B:4179]"
-testURIRef107 = testURIRef InvRf "http://example.org/abc#[2010:836B:4179::836B:4179]"
-testURIRef108 = testURIRef InvRf "http://example.org/xxx/[qwerty]#a[b]"
--- Random other things that crop up
-testURIRef111 = testURIRef AbsRf "http://example/Andr&#567;"
-testURIRef112 = testURIRef AbsId "file:///C:/DEV/Haskell/lib/HXmlToolbox-3.01/examples/"
-testURIRef113 = testURIRef AbsId "http://46229EFFE16A9BD60B9F1BE88B2DB047ADDED785/demo.mp3"
-testURIRef114 = testURIRef InvRf "http://example.org/xxx/qwerty#a#b"
-testURIRef115 = testURIRef InvRf "dcp.tcp.pft://192.168.0.1:1002:3002?fec=1&crc=0"
-testURIRef116 = testURIRef AbsId "dcp.tcp.pft://192.168.0.1:1002?fec=1&crc=0"
-testURIRef117 = testURIRef AbsId "foo://"
--- URIs prefixed with IPv4 addresses
-testURIRef118 = testURIRef AbsId "http://192.168.0.1.example.com/"
-testURIRef119 = testURIRef AbsId "http://192.168.0.1.example.com./"
--- URI prefixed with 3 octets of an IPv4 address and a subdomain part with a leading digit.
-testURIRef120 = testURIRef AbsId "http://192.168.0.1test.example.com/"
--- URI with IPv(future) address
-testURIRef121 = testURIRef AbsId "http://[v9.123.abc;456.def]/"
-testURIRef122 = testEq "v.future authority"
-                       (Just (URIAuth "" "[v9.123.abc;456.def]" ":42"))
-                       (maybe Nothing uriAuthority . parseURI $ "http://[v9.123.abc;456.def]:42/")
--- URIs with non-ASCII characters (IRIs), are not supported by Network.URI, but
--- captured here for possible future reference when IRI support may be added.
-testURIRef123 = testURIRef AbsId "http://example.com/test123/䡥汬漬⁗潲汤/index.html"
-testURIRef124 = testURIRef AbsId "http://example.com/test124/Москва/index.html"
-
 testURIRefSuite = TF.testGroup "Test URIrefs" testURIRefList
 testURIRefList =
-  [ TF.testCase "testURIRef001" testURIRef001
-  , TF.testCase "testURIRef002" testURIRef002
-  , TF.testCase "testURIRef003" testURIRef003
-  , TF.testCase "testURIRef004" testURIRef004
-  , TF.testCase "testURIRef005" testURIRef005
-  , TF.testCase "testURIRef006" testURIRef006
-  , TF.testCase "testURIRef007" testURIRef007
-  , TF.testCase "testURIRef008" testURIRef008
-  , TF.testCase "testURIRef009" testURIRef009
-  , TF.testCase "testURIRef010" testURIRef010
-    --
-  , TF.testCase "testURIRef011" testURIRef011
-  , TF.testCase "testURIRef012" testURIRef012
-  , TF.testCase "testURIRef013" testURIRef013
-  , TF.testCase "testURIRef014" testURIRef014
-  , TF.testCase "testURIRef015" testURIRef015
-  , TF.testCase "testURIRef016" testURIRef016
-  , TF.testCase "testURIRef017" testURIRef017
-  , TF.testCase "testURIRef018" testURIRef018
-    --
-  , TF.testCase "testURIRef019" testURIRef019
-    --
-  , TF.testCase "testURIRef021" testURIRef021
-  , TF.testCase "testURIRef022" testURIRef022
-  , TF.testCase "testURIRef023" testURIRef023
-  , TF.testCase "testURIRef024" testURIRef024
-  , TF.testCase "testURIRef025" testURIRef025
-  , TF.testCase "testURIRef026" testURIRef026
-  , TF.testCase "testURIRef027" testURIRef027
-  , TF.testCase "testURIRef028" testURIRef028
-  , TF.testCase "testURIRef029" testURIRef029
-    --
-  , TF.testCase "testURIRef031" testURIRef031
-  , TF.testCase "testURIRef032" testURIRef032
-  , TF.testCase "testURIRef033" testURIRef033
-  , TF.testCase "testURIRef034" testURIRef034
-  , TF.testCase "testURIRef035" testURIRef035
-  , TF.testCase "testURIRef036" testURIRef036
-  , TF.testCase "testURIRef037" testURIRef037
-  , TF.testCase "testURIRef038" testURIRef038
-  , TF.testCase "testURIRef039" testURIRef039
-  , TF.testCase "testURIRef040" testURIRef040
-  , TF.testCase "testURIRef041" testURIRef041
-  , TF.testCase "testURIRef042" testURIRef042
-  , TF.testCase "testURIRef043" testURIRef043
-  , TF.testCase "testURIRef044" testURIRef044
-  , TF.testCase "testURIRef045" testURIRef045
-  , TF.testCase "testURIRef046" testURIRef046
-  , TF.testCase "testURIRef047" testURIRef047
-  , TF.testCase "testURIRef048" testURIRef048
-  , TF.testCase "testURIRef049" testURIRef049
-  , TF.testCase "testURIRef050" testURIRef050
-  , TF.testCase "testURIRef051" testURIRef051
-  , TF.testCase "testURIRef052" testURIRef052
-  , TF.testCase "testURIRef053" testURIRef053
-  , TF.testCase "testURIRef054" testURIRef054
-  , TF.testCase "testURIRef055" testURIRef055
-  , TF.testCase "testURIRef056" testURIRef056
-  , TF.testCase "testURIRef057" testURIRef057
-  , TF.testCase "testURIRef058" testURIRef058
-  , TF.testCase "testURIRef059" testURIRef059
-  , TF.testCase "testURIRef060" testURIRef060
-  , TF.testCase "testURIRef061" testURIRef061
-  , TF.testCase "testURIRef062" testURIRef062
-  , TF.testCase "testURIRef063" testURIRef063
-  , TF.testCase "testURIRef064" testURIRef064
-  , TF.testCase "testURIRef065" testURIRef065
-  , TF.testCase "testURIRef066" testURIRef066
-  , TF.testCase "testURIRef067" testURIRef067
-  , TF.testCase "testURIRef068" testURIRef068
-  , TF.testCase "testURIRef069" testURIRef069
-  , TF.testCase "testURIRef070" testURIRef070
-  , TF.testCase "testURIRef071" testURIRef071
-  , TF.testCase "testURIRef072" testURIRef072
-  , TF.testCase "testURIRef073" testURIRef073
-  , TF.testCase "testURIRef074" testURIRef074
-  , TF.testCase "testURIRef075" testURIRef075
-  , TF.testCase "testURIRef076" testURIRef076
-  , TF.testCase "testURIRef077" testURIRef077
-    --
-  , TF.testCase "testURIRef080" testURIRef080
-  , TF.testCase "testURIRef081" testURIRef081
-  , TF.testCase "testURIRef082" testURIRef082
-  , TF.testCase "testURIRef083" testURIRef083
-  , TF.testCase "testURIRef084" testURIRef084
-  , TF.testCase "testURIRef085" testURIRef085
-  , TF.testCase "testURIRef086" testURIRef086
-  , TF.testCase "testURIRef087" testURIRef087
-    -- testURIRef088,
-    -- testURIRef089,
-  , TF.testCase "testURIRef090" testURIRef090
-  , TF.testCase "testURIRef091" testURIRef091
-  , TF.testCase "testURIRef092" testURIRef092
-  , TF.testCase "testURIRef093" testURIRef093
-  , TF.testCase "testURIRef094" testURIRef094
-  , TF.testCase "testURIRef095" testURIRef095
-  , TF.testCase "testURIRef096" testURIRef096
-  , TF.testCase "testURIRef097" testURIRef097
-  , TF.testCase "testURIRef098" testURIRef098
+  [ TF.testCase "testURIRef001" $ testURIRef AbsRf "http://example.org/aaa/bbb#ccc"
+  , TF.testCase "testURIRef002" $ testURIRef AbsId "mailto:local@domain.org"
+  , TF.testCase "testURIRef003" $ testURIRef AbsRf "mailto:local@domain.org#frag"
+  , TF.testCase "testURIRef004" $ testURIRef AbsRf "HTTP://EXAMPLE.ORG/AAA/BBB#CCC"
+  , TF.testCase "testURIRef005" $ testURIRef RelRf "//example.org/aaa/bbb#ccc"
+  , TF.testCase "testURIRef006" $ testURIRef RelRf "/aaa/bbb#ccc"
+  , TF.testCase "testURIRef007" $ testURIRef RelRf "bbb#ccc"
+  , TF.testCase "testURIRef008" $ testURIRef RelRf "#ccc"
+  , TF.testCase "testURIRef009" $ testURIRef RelRf "#"
+  , TF.testCase "testURIRef010" $ testURIRef RelRf "/"
+    -- escapes
+  , TF.testCase "testURIRef011" $ testURIRef AbsRf "http://example.org/aaa%2fbbb#ccc"
+  , TF.testCase "testURIRef012" $ testURIRef AbsRf "http://example.org/aaa%2Fbbb#ccc"
+  , TF.testCase "testURIRef013" $ testURIRef RelRf "%2F"
+  , TF.testCase "testURIRef014" $ testURIRef RelRf "aaa%2Fbbb"
+    -- ports
+  , TF.testCase "testURIRef015" $ testURIRef AbsRf "http://example.org:80/aaa/bbb#ccc"
+  , TF.testCase "testURIRef016" $ testURIRef AbsRf "http://example.org:/aaa/bbb#ccc"
+  , TF.testCase "testURIRef017" $ testURIRef AbsRf "http://example.org./aaa/bbb#ccc"
+  , TF.testCase "testURIRef018" $ testURIRef AbsRf "http://example.123./aaa/bbb#ccc"
+    -- bare authority
+  , TF.testCase "testURIRef019" $ testURIRef AbsId "http://example.org"
+    -- IPv6 literals (from RFC2732):
+  , TF.testCase "testURIRef021" $ testURIRef AbsId "http://[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:80/index.html"
+  , TF.testCase "testURIRef022" $ testURIRef AbsId "http://[1080:0:0:0:8:800:200C:417A]/index.html"
+  , TF.testCase "testURIRef023" $ testURIRef AbsId "http://[3ffe:2a00:100:7031::1]"
+  , TF.testCase "testURIRef024" $ testURIRef AbsId "http://[1080::8:800:200C:417A]/foo"
+  , TF.testCase "testURIRef025" $ testURIRef AbsId "http://[::192.9.5.5]/ipng"
+  , TF.testCase "testURIRef026" $ testURIRef AbsId "http://[::FFFF:129.144.52.38]:80/index.html"
+  , TF.testCase "testURIRef027" $ testURIRef AbsId "http://[2010:836B:4179::836B:4179]"
+  , TF.testCase "testURIRef028" $ testURIRef RelRf "//[2010:836B:4179::836B:4179]"
+  , TF.testCase "testURIRef029" $ testURIRef InvRf "[2010:836B:4179::836B:4179]"
+  , TF.testCase "testURIRef030" $ testURIRef AbsId "http://[fe80::ff:fe00:1%25eth0]"
+    -- RFC2396 test cases
+  , TF.testCase "testURIRef031" $ testURIRef RelRf "./aaa"
+  , TF.testCase "testURIRef032" $ testURIRef RelRf "../aaa"
+  , TF.testCase "testURIRef033" $ testURIRef AbsId "g:h"
+  , TF.testCase "testURIRef034" $ testURIRef RelRf "g"
+  , TF.testCase "testURIRef035" $ testURIRef RelRf "./g"
+  , TF.testCase "testURIRef036" $ testURIRef RelRf "g/"
+  , TF.testCase "testURIRef037" $ testURIRef RelRf "/g"
+  , TF.testCase "testURIRef038" $ testURIRef RelRf "//g"
+  , TF.testCase "testURIRef039" $ testURIRef RelRf "?y"
+  , TF.testCase "testURIRef040" $ testURIRef RelRf "g?y"
+  , TF.testCase "testURIRef041" $ testURIRef RelRf "#s"
+  , TF.testCase "testURIRef042" $ testURIRef RelRf "g#s"
+  , TF.testCase "testURIRef043" $ testURIRef RelRf "g?y#s"
+  , TF.testCase "testURIRef044" $ testURIRef RelRf ";x"
+  , TF.testCase "testURIRef045" $ testURIRef RelRf "g;x"
+  , TF.testCase "testURIRef046" $ testURIRef RelRf "g;x?y#s"
+  , TF.testCase "testURIRef047" $ testURIRef RelRf "."
+  , TF.testCase "testURIRef048" $ testURIRef RelRf "./"
+  , TF.testCase "testURIRef049" $ testURIRef RelRf ".."
+  , TF.testCase "testURIRef050" $ testURIRef RelRf "../"
+  , TF.testCase "testURIRef051" $ testURIRef RelRf "../g"
+  , TF.testCase "testURIRef052" $ testURIRef RelRf "../.."
+  , TF.testCase "testURIRef053" $ testURIRef RelRf "../../"
+  , TF.testCase "testURIRef054" $ testURIRef RelRf "../../g"
+  , TF.testCase "testURIRef055" $ testURIRef RelRf "../../../g"
+  , TF.testCase "testURIRef056" $ testURIRef RelRf "../../../../g"
+  , TF.testCase "testURIRef057" $ testURIRef RelRf "/./g"
+  , TF.testCase "testURIRef058" $ testURIRef RelRf "/../g"
+  , TF.testCase "testURIRef059" $ testURIRef RelRf "g."
+  , TF.testCase "testURIRef060" $ testURIRef RelRf ".g"
+  , TF.testCase "testURIRef061" $ testURIRef RelRf "g.."
+  , TF.testCase "testURIRef062" $ testURIRef RelRf "..g"
+  , TF.testCase "testURIRef063" $ testURIRef RelRf "./../g"
+  , TF.testCase "testURIRef064" $ testURIRef RelRf "./g/."
+  , TF.testCase "testURIRef065" $ testURIRef RelRf "g/./h"
+  , TF.testCase "testURIRef066" $ testURIRef RelRf "g/../h"
+  , TF.testCase "testURIRef067" $ testURIRef RelRf "g;x=1/./y"
+  , TF.testCase "testURIRef068" $ testURIRef RelRf "g;x=1/../y"
+  , TF.testCase "testURIRef069" $ testURIRef RelRf "g?y/./x"
+  , TF.testCase "testURIRef070" $ testURIRef RelRf "g?y/../x"
+  , TF.testCase "testURIRef071" $ testURIRef RelRf "g#s/./x"
+  , TF.testCase "testURIRef072" $ testURIRef RelRf "g#s/../x"
+  , TF.testCase "testURIRef073" $ testURIRef RelRf ""
+  , TF.testCase "testURIRef074" $ testURIRef RelRf "A'C"
+  , TF.testCase "testURIRef075" $ testURIRef RelRf "A$C"
+  , TF.testCase "testURIRef076" $ testURIRef RelRf "A@C"
+  , TF.testCase "testURIRef077" $ testURIRef RelRf "A,C"
+    -- Invalid
+  , TF.testCase "testURIRef080" $ testURIRef InvRf "http://foo.org:80Path/More"
+  , TF.testCase "testURIRef081" $ testURIRef InvRf "::"
+  , TF.testCase "testURIRef082" $ testURIRef InvRf " "
+  , TF.testCase "testURIRef083" $ testURIRef InvRf "%"
+  , TF.testCase "testURIRef084" $ testURIRef InvRf "A%Z"
+  , TF.testCase "testURIRef085" $ testURIRef InvRf "%ZZ"
+  , TF.testCase "testURIRef086" $ testURIRef InvRf "%AZ"
+  , TF.testCase "testURIRef087" $ testURIRef InvRf "A C"
+    -- testURIRef088 -- (case removed)
+    -- testURIRef089 -- (case removed)
+  , TF.testCase "testURIRef090" $ testURIRef InvRf "A\"C"
+  , TF.testCase "testURIRef091" $ testURIRef InvRf "A`C"
+  , TF.testCase "testURIRef092" $ testURIRef InvRf "A<C"
+  , TF.testCase "testURIRef093" $ testURIRef InvRf "A>C"
+  , TF.testCase "testURIRef094" $ testURIRef InvRf "A^C"
+  , TF.testCase "testURIRef095" $ testURIRef InvRf "A\\C"
+  , TF.testCase "testURIRef096" $ testURIRef InvRf "A{C"
+  , TF.testCase "testURIRef097" $ testURIRef InvRf "A|C"
+  , TF.testCase "testURIRef098" $ testURIRef InvRf "A}C"
     -- testURIRef099,
     --
-  , TF.testCase "testURIRef101" testURIRef101
-  , TF.testCase "testURIRef102" testURIRef102
-  , TF.testCase "testURIRef103" testURIRef103
-  , TF.testCase "testURIRef104" testURIRef104
-  , TF.testCase "testURIRef105" testURIRef105
-  , TF.testCase "testURIRef106" testURIRef106
-  , TF.testCase "testURIRef107" testURIRef107
-  , TF.testCase "testURIRef108" testURIRef108
-    --
-  , TF.testCase "testURIRef111" testURIRef111
-  , TF.testCase "testURIRef112" testURIRef112
-  , TF.testCase "testURIRef113" testURIRef113
-  , TF.testCase "testURIRef114" testURIRef114
-  , TF.testCase "testURIRef115" testURIRef115
-  , TF.testCase "testURIRef116" testURIRef116
-  , TF.testCase "testURIRef117" testURIRef117
-    --
-  , TF.testCase "testURIRef118" testURIRef118
-  , TF.testCase "testURIRef119" testURIRef119
-  , TF.testCase "testURIRef120" testURIRef120
-    --
-  , TF.testCase "testURIRef121" testURIRef121
-  , TF.testCase "testURIRef122" testURIRef122
+    -- From RFC2396:
+    -- rel_segment   = 1*( unreserved | escaped |
+    --                     ";" | "@" | "&" | "=" | "+" | "$" | "," )
+    -- unreserved    = alphanum | mark
+    -- mark          = "-" | "_" | "." | "!" | "~" | "*" | "'" |
+    --                 "(" | ")"
+    -- Note RFC 2732 allows '[', ']' ONLY for reserved purpose of IPv6 literals,
+    -- or does it?
+  , TF.testCase "testURIRef101" $ testURIRef InvRf "A[C"
+  , TF.testCase "testURIRef102" $ testURIRef InvRf "A]C"
+  , TF.testCase "testURIRef103" $ testURIRef InvRf "A[**]C"
+  , TF.testCase "testURIRef104" $ testURIRef InvRf "http://[xyz]/"
+  , TF.testCase "testURIRef105" $ testURIRef InvRf "http://]/"
+  , TF.testCase "testURIRef106" $ testURIRef InvRf "http://example.org/[2010:836B:4179::836B:4179]"
+  , TF.testCase "testURIRef107" $ testURIRef InvRf "http://example.org/abc#[2010:836B:4179::836B:4179]"
+  , TF.testCase "testURIRef108" $ testURIRef InvRf "http://example.org/xxx/[qwerty]#a[b]"
+    -- Random other things that crop up
+  , TF.testCase "testURIRef111" $ testURIRef AbsRf "http://example/Andr&#567;"
+  , TF.testCase "testURIRef112" $ testURIRef AbsId "file:///C:/DEV/Haskell/lib/HXmlToolbox-3.01/examples/"
+  , TF.testCase "testURIRef113" $ testURIRef AbsId "http://46229EFFE16A9BD60B9F1BE88B2DB047ADDED785/demo.mp3"
+  , TF.testCase "testURIRef114" $ testURIRef InvRf "http://example.org/xxx/qwerty#a#b"
+  , TF.testCase "testURIRef115" $ testURIRef InvRf "dcp.tcp.pft://192.168.0.1:1002:3002?fec=1&crc=0"
+  , TF.testCase "testURIRef116" $ testURIRef AbsId "dcp.tcp.pft://192.168.0.1:1002?fec=1&crc=0"
+  , TF.testCase "testURIRef117" $ testURIRef AbsId "foo://"
+    -- URIs prefixed with IPv4 addresses
+  , TF.testCase "testURIRef118" $ testURIRef AbsId "http://192.168.0.1.example.com/"
+  , TF.testCase "testURIRef119" $ testURIRef AbsId "http://192.168.0.1.example.com./"
+    -- URI prefixed with 3 octets of an IPv4 address and a subdomain part with a leading digit.
+  , TF.testCase "testURIRef120" $ testURIRef AbsId "http://192.168.0.1test.example.com/"
+    -- URI with IPv(future) address
+  , TF.testCase "testURIRef121" $ testURIRef AbsId "http://[v9.123.abc;456.def]/"
+  , TF.testCase "testURIRef122" $ testEq "v.future authority"
+      (Just (URIAuth "" "[v9.123.abc;456.def]" ":42"))
+      (maybe Nothing uriAuthority . parseURI $ "http://[v9.123.abc;456.def]:42/")
     -- IRI test cases not currently supported
-  -- , TF.testCase "testURIRef123" testURIRef123
-  -- , TF.testCase "testURIRef124" testURIRef124
+    -- URIs with non-ASCII characters (IRIs), are not supported by Network.URI, but
+    -- captured here for possible future reference when IRI support may be added.
+  -- , TF.testCase "testURIRef123" $ testURIRef AbsId "http://example.com/test123/䡥汬漬⁗潲汤/index.html"
+  -- , TF.testCase "testURIRef124" $ testURIRef AbsId "http://example.com/test124/Москва/index.html"
   ]
 
 -- test decomposition of URI into components
