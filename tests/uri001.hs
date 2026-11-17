@@ -1004,6 +1004,13 @@ testNormalize01 = testEq "testNormalize01"
                   "http://EXAMPLE.com/Root/%2A?%2B#%2C"
                   (normalizeCase "HTTP://EXAMPLE.com/Root/%2a?%2b#%2c")
 
+testNormalize02 :: TF.TestTree
+testNormalize02 = TF.testGroup "testNormalize02"
+  [ TF.testCase "testNormalize02a" (normalizeCase "relative" @=? "relative")
+  , TF.testCase "testNormalize02b" (normalizeCase "foo/bar" @=? "foo/bar")
+  , TF.testCase "testNormalize02c" (normalizeCase "./a:b" @=? "./a:b")
+  ]
+
 --  Encoding normalization; cf. RFC2396bis section 6.2.2.2
 testNormalize11 = testEq "testNormalize11"
                   "HTTP://EXAMPLE.com/Root/~Me/"
@@ -1043,6 +1050,7 @@ testNormalize28 = testEq "testNormalize28"
 
 testNormalizeSuite = TF.testGroup "testNormalizeSuite"
   [ TF.testCase "testNormalize01" testNormalize01
+  , testNormalize02
   , TF.testCase "testNormalize11" testNormalize11
   , TF.testCase "testNormalize12" testNormalize12
   , TF.testCase "testNormalize13" testNormalize13
@@ -1427,6 +1435,7 @@ oddb = testOddballSuite
 -- fileuri = testURIReference "file:///C:/DEV/Haskell/lib/HXmlToolbox-3.01/examples/"
 
 cu02 = ou02 `relativeTo` bu02
+
 
 --------------------------------------------------------------------------------
 --
