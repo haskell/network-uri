@@ -45,8 +45,6 @@ import Network.URI
     , pathSegments
     )
 
-import Test.HUnit
-
 import Data.Bits ((.&.), (.|.))
 import Data.Char (ord, chr)
 import Data.Maybe (fromJust, isJust, isNothing)
@@ -54,6 +52,7 @@ import Data.List (intercalate)
 import System.IO (openFile, IOMode(WriteMode), hClose)
 import qualified Test.Tasty as TF
 import qualified Test.Tasty.HUnit as TF
+import Test.Tasty.HUnit ((@?=), (@=?))
 import qualified Test.Tasty.QuickCheck as TF
 import Test.QuickCheck ((==>), Property)
 #if __GLASGOW_HASKELL__ >= 760
@@ -81,17 +80,17 @@ isAbsIdT :: URIType -> Bool
 isAbsIdT AbsId = True
 isAbsIdT _     = False
 
-testEq :: (Eq a, Show a) => String -> a -> a -> Assertion
-testEq lab a1 a2 = assertEqual lab a1 a2
+testEq :: (Eq a, Show a) => String -> a -> a -> TF.Assertion
+testEq lab a1 a2 = TF.assertEqual lab a1 a2
 
-testURIRef :: URIType -> String -> Assertion
+testURIRef :: URIType -> String -> TF.Assertion
 testURIRef t u = sequence_
   [ testEq ("test_isURIReference:"++u) (isValidT t) (isURIReference u)
   , testEq ("test_isRelativeReference:"++u)  (isRelRfT t) (isRelativeReference  u)
   , testEq ("test_isAbsoluteURI:"++u)  (isAbsIdT t) (isAbsoluteURI  u)
   ]
 
-testURIRefComponents :: Maybe URI -> String -> Assertion
+testURIRefComponents :: Maybe URI -> String -> TF.Assertion
 testURIRefComponents uv us =
     uv @?= (parseURIReference us)
 
@@ -344,7 +343,7 @@ testComponentSuite = TF.testGroup "Test URIrefs"
 -- NOTE:  absoluteURI base (relativeRef base u) is always equivalent to u.
 -- cf. http://lists.w3.org/Archives/Public/uri/2003Jan/0008.html
 
-testRelSplit :: String -> String -> String -> String -> Assertion
+testRelSplit :: String -> String -> String -> String -> TF.Assertion
 testRelSplit label base uabs urel =
     testEq label urel (mkrel puabs pubas)
     where
@@ -354,7 +353,7 @@ testRelSplit label base uabs urel =
         puabs = parseURIReference uabs
         pubas = parseURIReference base
 
-testRelJoin  :: String -> String -> String -> String -> Assertion
+testRelJoin  :: String -> String -> String -> String -> TF.Assertion
 testRelJoin label base urel uabs =
     testEq label uabs (mkabs purel pubas)
     where
@@ -364,7 +363,7 @@ testRelJoin label base urel uabs =
         purel = parseURIReference urel
         pubas = parseURIReference base
 
-testRelative :: String -> String -> String -> String -> Assertion
+testRelative :: String -> String -> String -> String -> TF.Assertion
 testRelative label base uabs urel = sequence_
     [
     testRelSplit (label++"(rel)") base uabs urel,
@@ -1159,15 +1158,15 @@ testAltFn = TF.testGroup "testAltFn"
   , TF.testCase "testAltFn17" testAltFn17
   ]
 
-testUriIsAbsolute :: String -> Assertion
+testUriIsAbsolute :: String -> TF.Assertion
 testUriIsAbsolute str =
-    assertBool str (uriIsAbsolute uri)
+    TF.assertBool str (uriIsAbsolute uri)
     where
     Just uri = parseURIReference str
 
-testUriIsRelative :: String -> Assertion
+testUriIsRelative :: String -> TF.Assertion
 testUriIsRelative str =
-    assertBool str (uriIsRelative uri)
+    TF.assertBool str (uriIsRelative uri)
     where
     Just uri = parseURIReference str
 
@@ -1184,7 +1183,7 @@ testIsRelative = TF.testGroup "testIsRelative"
   , TF.testCase "testIsRelative04" $ testUriIsRelative "?what=that"
   ]
 
-testPathSegmentsRoundTrip :: URI -> Assertion
+testPathSegmentsRoundTrip :: URI -> TF.Assertion
 testPathSegmentsRoundTrip u =
   let segs = pathSegments u
 
@@ -1200,7 +1199,7 @@ testPathSegmentsRoundTrip u =
   in
      (Data.List.intercalate "/" segs @?= strippedUriPath)
 
-assertJust _f Nothing = assertFailure "URI failed to parse"
+assertJust _f Nothing = TF.assertFailure "URI failed to parse"
 assertJust f  (Just x) = f x
 
 testPathSegments = TF.testGroup "testPathSegments"
@@ -1286,12 +1285,11 @@ allTests = TF.testGroup "all"
 
 main = TF.defaultMain allTests
 
-runTestFile t = do
-    h <- openFile "a.tmp" WriteMode
-    _ <- runTestText (putTextToHandle h False) t
-    hClose h
-tf = runTestFile
-tt = runTestTT
+-- runTestFile t = do
+--     h <- openFile "a.tmp" WriteMode
+--     _ <- runTestText (putTextToHandle h False) t
+--     hClose h
+-- tf = runTestFile
 
 -- Miscellaneous values for hand-testing/debugging in Hugs:
 
