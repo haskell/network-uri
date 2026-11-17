@@ -1368,7 +1368,7 @@ normalizeCase uristr = ncScheme uristr
     where
         ncScheme (':':cs)                = ':':ncEscape cs
         ncScheme (c:cs) | isSchemeChar c = toLower c:ncScheme cs
-        ncScheme _                       = ncEscape uristr -- no scheme present
+        ncScheme remainder               = ncEscape remainder -- no scheme present
         ncEscape ('%':h1:h2:cs) = '%':toUpper h1:toUpper h2:ncEscape cs
         ncEscape (c:cs)         = c:ncEscape cs
         ncEscape []             = []
