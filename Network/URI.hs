@@ -297,6 +297,9 @@ defaultUserInfoMap uinf = user++newpass
                         then pass
                         else ":...@"
 
+preservingUserInfoMap :: String -> String
+preservingUserInfoMap uinf = uinf
+
 ------------------------------------------------------------
 --  Parse a URI
 ------------------------------------------------------------
@@ -1387,11 +1390,11 @@ normalizeEscape []             = []
 -- |Path segment normalization; cf. RFC3986 section 6.2.2.3
 --
 normalizePathSegments :: String -> String
-normalizePathSegments uristr = normstr juri
+normalizePathSegments uristr = normstr (parseURI uristr)
     where
-        juri = parseURI uristr
+        normstr :: Maybe URI -> String
         normstr Nothing  = uristr
-        normstr (Just u) = show (normuri u)
+        normstr (Just u) = uriToString preservingUserInfoMap (normuri u) ""
         normuri u = u { uriPath = removeDotSegments (uriPath u) }
 
 ------------------------------------------------------------
