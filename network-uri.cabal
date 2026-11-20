@@ -57,8 +57,6 @@ tested-with:
    || ==8.8.2
    || ==8.6.5
    || ==8.4.4
-   || ==8.2.2
-   || ==8.0.2
 
 library
   exposed-modules:
@@ -69,14 +67,14 @@ library
     base >= 3 && < 5,
     deepseq >= 1.1 && < 1.6,
     parsec >= 3.1.12.0 && < 3.2,
-    th-compat >= 0.1.1 && < 1.0
-  build-depends: template-haskell
+    th-compat >= 0.1.1 && < 1
+  build-depends: template-haskell < 2.25
   default-extensions: CPP, DeriveDataTypeable
   if impl(ghc < 7.6)
-    build-depends: ghc-prim
+    build-depends: ghc-prim < 0.3
   if impl(ghc >= 7.2)
     default-extensions: DeriveGeneric
-  ghc-options: -Wall -fwarn-tabs
+  ghc-options: -Wall -fwarn-tabs -Werror=incomplete-patterns -Werror=incomplete-uni-patterns
   default-language: Haskell98
 
   if impl(ghc >= 9.0)
@@ -108,7 +106,6 @@ benchmark uri-bench
 
   build-depends:
     base < 5,
-    HUnit,
     network-uri,
     tasty-bench,
     deepseq
@@ -118,4 +115,4 @@ benchmark uri-bench
 
 source-repository head
   type:     git
-  location: git://github.com/haskell/network-uri.git
+  location: https://github.com/haskell/network-uri.git
