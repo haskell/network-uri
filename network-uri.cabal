@@ -76,7 +76,7 @@ library
     build-depends: ghc-prim
   if impl(ghc >= 7.2)
     default-extensions: DeriveGeneric
-  ghc-options: -Wall -fwarn-tabs
+  ghc-options: -Wall -fwarn-tabs -Werror=incomplete-patterns -Werror=incomplete-uni-patterns
   default-language: Haskell98
 
   if impl(ghc >= 9.0)
