@@ -106,7 +106,6 @@ benchmark uri-bench
 
   build-depends:
     base < 5,
-    HUnit,
     network-uri,
     tasty-bench,
     deepseq
