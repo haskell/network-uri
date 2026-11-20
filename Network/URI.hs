@@ -567,15 +567,15 @@ ipLiteral =
 
 ipvFuture :: URIParser String
 ipvFuture =
-    do  { _ <- char 'v'
-        ; h <- hexDigitChar
+    do  { _ <- char 'v' <|> char 'V'
+        ; h <- many1 hexDigitChar
         ; _ <- char '.'
         ; a <- many1 (satisfy isIpvFutureChar)
-        ; return $ 'v':h:'.':a
+        ; return $ 'v':(h ++'.':a)
         }
 
 isIpvFutureChar :: Char -> Bool
-isIpvFutureChar c = isUnreserved c || isSubDelims c || (c==';')
+isIpvFutureChar c = isUnreserved c || isSubDelims c || (c==':')
 
 zoneid :: URIParser String
 zoneid = concat <$> many1 (unreservedChar <|> escaped)
