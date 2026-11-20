@@ -89,7 +89,6 @@ test-suite uri
 
   build-depends:
     base < 5,
-    HUnit,
     network-uri,
     tasty,
     tasty-hunit,
