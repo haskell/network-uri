@@ -57,8 +57,6 @@ tested-with:
    || ==8.8.2
    || ==8.6.5
    || ==8.4.4
-   || ==8.2.2
-   || ==8.0.2
 
 library
   exposed-modules:
