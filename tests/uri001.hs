@@ -1047,6 +1047,15 @@ testNormalize27 = testEq "testNormalize27"
 testNormalize28 = testEq "testNormalize28"
                     "foo:e"
                     (normalizePathSegments "foo:a/b/../.././../../e")
+testNormalize29 = testEq "testNormalize29"
+                    "http://example..foo/"
+                    (normalizePathSegments "http://example..foo/")
+
+testNormalize30 =
+  normalizePathSegments "http://user:pass@example.com/a/../b" @=? "http://user:pass@example.com/b"
+testNormalize31 =
+  normalizePathSegments "http://user:pass@example.com/b" @=? "http://user:pass@example.com/b"
+
 
 testNormalizeSuite = TF.testGroup "testNormalizeSuite"
   [ TF.testCase "testNormalize01" testNormalize01
@@ -1062,6 +1071,9 @@ testNormalizeSuite = TF.testGroup "testNormalizeSuite"
   , TF.testCase "testNormalize26" testNormalize26
   , TF.testCase "testNormalize27" testNormalize27
   , TF.testCase "testNormalize28" testNormalize28
+  , TF.testCase "testNormalize29" testNormalize29
+  , TF.testCase "testNormalize30" testNormalize30
+  , TF.testCase "testNormalize31" testNormalize31
   ]
 
 -- URI formatting (show) tests
