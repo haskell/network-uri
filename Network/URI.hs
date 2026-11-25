@@ -1275,6 +1275,16 @@ relativeFrom uabs base
         , uriPath      = relPathFrom (removeBodyDotSegments $ uriPath uabs)
                                      (removeBodyDotSegments $ uriPath base)
         }
+    | diff uriQuery     uabs base, null (uriQuery uabs) =
+        -- An empty path would keep the query of base, so give the last
+        -- segment of the path (or the authority, if the path is empty).
+        if null (uriPath uabs)
+            then if isJust (uriAuthority uabs) then uabs { uriScheme = "" } else uabs
+            else uabs
+                { uriScheme    = ""
+                , uriAuthority = Nothing
+                , uriPath      = protectName (snd (splitLast (uriPath uabs)))
+                }
     | diff uriQuery     uabs base = uabs
         { uriScheme    = ""
         , uriAuthority = Nothing
@@ -1326,15 +1336,20 @@ relPathFrom1 pabs base = relName
                       -- If the relative path is empty, and the basenames are
                       -- the same, then the paths must be exactly the same.
                       if na == nb then ""
-                      -- If the name is vulnerable to being misinterpreted,
-                      -- add a dot segment in advance to protect it.
-                      else if protect na then "./"++na
-                      else na
+                      else protectName na
                   else
-                      rp++na
-        -- If a single-segment path is null or contains a ':', it needs
-        -- "protection" from being interpreted as a different kind of URL.
-        protect s = null s || ':' `elem` s
+                      -- If the relative path starts with an empty segment,
+                      -- protect it from being read as an absolute path.
+                      if take 1 rp == "/" then "./"++rp++na
+                      else rp++na
+
+-- If a single-segment path is null or contains a ':', it needs "protection"
+-- from being interpreted as a different kind of URL: add a dot segment in
+-- advance.
+protectName :: String -> String
+protectName s
+    | null s || ':' `elem` s = "./"++s
+    | otherwise              = s
 
 --  relSegsFrom discards any equal leading segments from two *directory*
 --  paths, then invokes difSegsFrom to calculate a relative path from the end

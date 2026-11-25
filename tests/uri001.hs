@@ -691,6 +691,22 @@ testRelative80 = testRelative "testRelative80"
                     "file:/some/dir/foo" "file:/some/dir/#" "./#"
 testRelative81 = testRelative "testRelative81"
                     "file:/some/dir/.." "file:/some/dir/#blort" "./#blort"
+-- Without a path, the relative reference would keep the query of the base.
+testRelative82 = testRelative "testRelative82"
+                    "http://ex/x/y?q" "http://ex/x/y#f" "y#f"
+testRelative83 = testRelative "testRelative83"
+                    "http://ex/x/y?q" "http://ex/x/y" "y"
+testRelative84 = testRelative "testRelative84"
+                    "http://ex/x/?q" "http://ex/x/" "./"
+testRelative85 = testRelative "testRelative85"
+                    "http://ex/x:y?q" "http://ex/x:y" "./x:y"
+testRelative88 = testRelative "testRelative88"
+                    "http://ex?q" "http://ex" "//ex"
+-- A relative path starting with an empty segment must not become absolute.
+testRelative86 = testRelative "testRelative86"
+                    "http://ex/x/index.html" "http://ex/x//y" ".//y"
+testRelative87 = testRelative "testRelative87"
+                    "http://ex/x/z" "http://ex/x//y/w" ".//y/w"
 
 -- testRelative  base abs rel
 -- testRelSplit  base abs rel
@@ -804,6 +820,13 @@ testRelativeList  =
   , TF.testCase "testRelative79" testRelative79
   , TF.testCase "testRelative80" testRelative80
   , TF.testCase "testRelative81" testRelative81
+  , TF.testCase "testRelative82" testRelative82
+  , TF.testCase "testRelative83" testRelative83
+  , TF.testCase "testRelative84" testRelative84
+  , TF.testCase "testRelative85" testRelative85
+  , TF.testCase "testRelative86" testRelative86
+  , TF.testCase "testRelative87" testRelative87
+  , TF.testCase "testRelative88" testRelative88
     --
   -- , TF.testCase "testRelative90" testRelative90
   , TF.testCase "testRelative91" testRelative91
